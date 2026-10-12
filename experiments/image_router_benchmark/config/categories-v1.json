@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "1.0.0",
+  "descriptionVersion": "image-router-categories-v1",
+  "aggregation": "mean_of_l2_normalized_prompt_embeddings_then_l2_normalize",
+  "comparisonScores": {
+    "method": "softmax_over_cosine_similarity",
+    "temperature": 0.02,
+    "warning": "Scores are relative comparison values, not calibrated probabilities."
+  },
+  "types": {
+    "qr_code": [
+      "a QR code or square matrix barcode intended for machine scanning",
+      "a black and white two dimensional barcode with finder squares",
+      "an image dominated by a scannable QR pattern"
+    ],
+    "plain_text_or_decorative_text": [
+      "an image dominated by ordinary readable text or a text poster",
+      "a text-heavy screenshot with little diagram structure",
+      "stylized decorative lettering or a typographic title image"
+    ],
+    "code_screenshot": [
+      "a screenshot containing source code with syntax highlighting",
+      "a code editor or terminal showing programming code",
+      "monospaced computer code arranged in indented lines"
+    ],
+    "table": [
+      "a data table with rows columns headers and cells",
+      "a spreadsheet-like grid containing structured values",
+      "tabular information organized into aligned rows and columns"
+    ],
+    "chart_or_plot": [
+      "a chart or mathematical plot with axes and plotted data",
+      "a statistical graph with curves bars points legends or axis labels",
+      "a quantitative visualization showing trends or numeric relationships"
+    ],
+    "diagram_or_flowchart": [
+      "an architecture diagram or flowchart with nodes and arrows",
+      "a structured process diagram showing components and relationships",
+      "a conceptual technical diagram with connected boxes groups or directions"
+    ],
+    "ui_screenshot": [
+      "a software user interface screenshot containing panels and controls",
+      "an application or web interface with menus buttons forms or status areas",
+      "a computer screen capture dominated by interactive interface elements"
+    ],
+    "informative_photo": [
+      "a photograph of a real scene object device or person that conveys information",
+      "a real-world photo whose objects states or relationships may matter",
+      "a documentary or explanatory photograph rather than a diagram"
+    ],
+    "decorative_image": [
+      "a decorative illustration or photograph with little informational content",
+      "a visual ornament background or aesthetic image used mainly for decoration",
+      "a non-informational scene illustration or filler image"
+    ],
+    "logo_or_icon": [
+      "a logo emblem isolated brand mark or application icon",
+      "a simple symbolic mark used for branding or identification",
+      "an isolated logo badge icon or watermark graphic"
+    ],
+    "other_or_uncertain": [
+      "an ambiguous mixed image that does not clearly match one visual category",
+      "an unusual image whose primary visual type is uncertain",
+      "a mixed-content visual requiring human inspection to categorize"
+    ]
+  },
+  "routes": {
+    "local_qr": [
+      "a QR barcode that should be sent to a deterministic local QR decoder",
+      "a scannable square matrix code suitable for local barcode decoding",
+      "an image whose main machine-readable content is a QR code"
+    ],
+    "local_ocr": [
+      "a primarily textual image suitable for local optical character recognition",
+      "a text poster or plain text screenshot that mainly needs transcription",
+      "an image where reading ordinary text is the main processing need"
+    ],
+    "cloud_code": [
+      "a programming code screenshot requiring careful code transcription",
+      "source code whose indentation and exact symbols need specialized processing",
+      "a code editor or terminal image that should be handled as code"
+    ],
+    "cloud_structured_visual": [
+      "a complex diagram chart table or interface requiring structured visual understanding",
+      "a visual with layout relationships axes cells nodes or arrows that OCR alone cannot preserve",
+      "a technical structured image requiring combined text and spatial reasoning"
+    ],
+    "cloud_visual_description": [
+      "a meaningful real-world photo or visual scene requiring semantic description",
+      "a non-tabular image whose objects states and relationships need visual explanation",
+      "an informative scene best represented by a concise visual description"
+    ],
+    "skip_candidate": [
+      "a decorative image logo watermark or ornament with little retrieval value",
+      "a visual that appears mainly decorative or branding-only",
+      "a simple non-informational graphic that may be excluded from text retrieval"
+    ],
+    "uncertain": [
+      "an ambiguous or mixed image that should be reviewed instead of automatically routed",
+      "a low-confidence visual whose processing requirement is unclear",
+      "an image with conflicting content types requiring human or multimodal review"
+    ]
+  },
+  "routeThresholds": {
+    "default": {
+      "minComparisonScore": 0.4,
+      "minCosineMargin": 0.015
+    },
+    "local_qr": {
+      "minComparisonScore": 0.65,
+      "minCosineMargin": 0.03
+    },
+    "local_ocr": {
+      "minComparisonScore": 0.65,
+      "minCosineMargin": 0.03
+    },
+    "skip_candidate": {
+      "minComparisonScore": 0.75,
+      "minCosineMargin": 0.04
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "images": {
+    "d0c476840a25b2790c37b7c60825dbfa08ce891f10a6a491638dc23447d04994": {
+      "localOnly": true,
+      "reasonCode": "credential-like-content-requires-source-cleanup"
+    }
+  },
+  "schemaVersion": "1.0.0"
+}

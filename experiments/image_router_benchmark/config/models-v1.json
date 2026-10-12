@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "modelsVersion": "image-router-models-v1.1",
+  "models": {
+    "mobileclip2_s0": {
+      "backend": "mobileclip",
+      "displayName": "MobileCLIP2-S0",
+      "repository": "apple/MobileCLIP2-S0",
+      "revision": "3136ea51c8ed56b9f9abfab04cb816735aaad6cb",
+      "checkpoint": "mobileclip2_s0.pt",
+      "downloadPatterns": [
+        "mobileclip2_s0.pt",
+        "README.md",
+        "LICENSE",
+        "config.json"
+      ],
+      "implementation": "https://github.com/apple/ml-mobileclip",
+      "implementationRevision": "aecfb5453d022e9deff12f81a150ea8f35194baa",
+      "adapterRevision": "mobileclip-official-zero-one-v1",
+      "preprocessId": "apple-mobileclip2-s0-zero-one-rgb-v1",
+      "codeLicense": "MIT",
+      "weightLicense": "Apple Machine Learning Research Model License (research-only)"
+    },
+    "openai_clip_vit_b32": {
+      "backend": "transformers_clip",
+      "displayName": "OpenAI CLIP ViT-B/32",
+      "repository": "openai/clip-vit-base-patch32",
+      "revision": "3d74acf9a28c67741b2f4f2ea7635f0aaf6f0268",
+      "implementation": "transformers",
+      "downloadPatterns": [
+        "pytorch_model.bin",
+        "config.json",
+        "preprocessor_config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "special_tokens_map.json",
+        "vocab.json",
+        "merges.txt",
+        "added_tokens.json",
+        "README.md"
+      ],
+      "adapterRevision": "transformers-clip-v1",
+      "preprocessId": "hf-openai-clip-vit-base-patch32-v1",
+      "codeLicense": "Apache-2.0 (Transformers); MIT (original OpenAI CLIP code)",
+      "weightLicense": "OpenAI CLIP research release; official model card requires task-specific validation"
+    },
+    "siglip2_base_patch16_224": {
+      "backend": "transformers_siglip2",
+      "displayName": "SigLIP2 Base Patch16 224",
+      "repository": "google/siglip2-base-patch16-224",
+      "revision": "75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2",
+      "implementation": "transformers",
+      "downloadPatterns": [
+        "model.safetensors",
+        "config.json",
+        "preprocessor_config.json",
+        "tokenizer.json",
+        "tokenizer.model",
+        "tokenizer_config.json",
+        "special_tokens_map.json",
+        "README.md"
+      ],
+      "adapterRevision": "transformers-siglip2-maxlen64-v1",
+      "preprocessId": "hf-google-siglip2-base-patch16-224-maxlen64-v1",
+      "codeLicense": "Apache-2.0",
+      "weightLicense": "Apache-2.0"
+    }
+  }
+}

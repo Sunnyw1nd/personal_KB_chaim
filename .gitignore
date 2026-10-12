@@ -1,0 +1,57 @@
+# Python and local development artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Read-only personal inputs and generated outputs (not a public dataset)
+/samples/
+/test_pictures/
+output/
+.work/
+*.zip
+*.xlsx
+*.xls
+
+# Credentials; only the empty root template is publishable
+.env
+.env.*
+!/.env.example
+*.pem
+*.key
+credentials.json
+
+# Independent experiment outputs and large model artifacts
+/experiments/**/runs/
+/experiments/**/cache/
+/experiments/**/models/
+/experiments/**/weights/
+/experiments/**/third_party/
+/experiments/**/reports/*cleanup-preview*.json
+/experiments/**/reports/*source-integrity*.json
+/experiments/**/reports/*quality-review*.json
+*.safetensors
+*.pt
+*.pth
+*.onnx
+
+# LAN spike contains a deployment-specific private endpoint; keep local only.
+# Publish a separately sanitized version if it is needed later.
+/experiments/lan_vlm_qwen25_3b/
+
+# Machine-specific editor/OS state
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini

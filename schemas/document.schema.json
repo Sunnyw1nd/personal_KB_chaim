@@ -1,0 +1,1061 @@
+{
+  "$defs": {
+    "Asset": {
+      "additionalProperties": false,
+      "properties": {
+        "assetId": {
+          "pattern": "^asset-(?:[0-9]{4,}|[0-9a-f]{12})$",
+          "title": "Assetid",
+          "type": "string"
+        },
+        "declaredMediaType": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Declaredmediatype"
+        },
+        "description": {
+          "default": null,
+          "title": "Description",
+          "type": "null"
+        },
+        "descriptionMethod": {
+          "default": null,
+          "title": "Descriptionmethod",
+          "type": "null"
+        },
+        "descriptionStatus": {
+          "const": "pending",
+          "title": "Descriptionstatus",
+          "type": "string"
+        },
+        "detectedMediaType": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Detectedmediatype"
+        },
+        "found": {
+          "title": "Found",
+          "type": "boolean"
+        },
+        "height": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Height"
+        },
+        "identityKey": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identitykey"
+        },
+        "identityMethod": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Identitymethod"
+        },
+        "localSrc": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Localsrc"
+        },
+        "ocrText": {
+          "default": null,
+          "title": "Ocrtext",
+          "type": "null"
+        },
+        "originalFileName": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Originalfilename"
+        },
+        "originalUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Originalurl"
+        },
+        "outputPath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Outputpath"
+        },
+        "role": {
+          "const": "article_body_image",
+          "title": "Role",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "sizeBytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sizebytes"
+        },
+        "sourcePath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sourcepath"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Width"
+        }
+      },
+      "required": [
+        "assetId",
+        "role",
+        "sourcePath",
+        "outputPath",
+        "localSrc",
+        "originalUrl",
+        "declaredMediaType",
+        "detectedMediaType",
+        "originalFileName",
+        "sizeBytes",
+        "found",
+        "descriptionStatus"
+      ],
+      "title": "Asset",
+      "type": "object"
+    },
+    "AssetCompleteness": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "minimum": 0,
+          "title": "Available",
+          "type": "integer"
+        },
+        "completenessRate": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Completenessrate",
+          "type": "number"
+        },
+        "expected": {
+          "minimum": 0,
+          "title": "Expected",
+          "type": "integer"
+        },
+        "invalid": {
+          "minimum": 0,
+          "title": "Invalid",
+          "type": "integer"
+        },
+        "invalidAssetIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidassetids",
+          "type": "array"
+        },
+        "missing": {
+          "minimum": 0,
+          "title": "Missing",
+          "type": "integer"
+        },
+        "missingAssetIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missingassetids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "expected",
+        "available",
+        "missing",
+        "invalid",
+        "completenessRate",
+        "missingAssetIds",
+        "invalidAssetIds"
+      ],
+      "title": "AssetCompleteness",
+      "type": "object"
+    },
+    "Block": {
+      "additionalProperties": false,
+      "properties": {
+        "assetId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assetid"
+        },
+        "blockId": {
+          "pattern": "^block-[0-9]{4,}$",
+          "title": "Blockid",
+          "type": "string"
+        },
+        "caption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption"
+        },
+        "captionInlines": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/InlineSpan"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Captioninlines"
+        },
+        "content": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content"
+        },
+        "inlines": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/InlineSpan"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inlines"
+        },
+        "items": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ListItem"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Items"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "level": {
+          "anyOf": [
+            {
+              "maximum": 6,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Level"
+        },
+        "order": {
+          "minimum": 1,
+          "title": "Order",
+          "type": "integer"
+        },
+        "ordered": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ordered"
+        },
+        "originalTag": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Originaltag"
+        },
+        "rows": {
+          "anyOf": [
+            {
+              "items": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rows"
+        },
+        "sourceLocator": {
+          "title": "Sourcelocator",
+          "type": "string"
+        },
+        "sourceUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sourceurl"
+        },
+        "type": {
+          "enum": [
+            "heading",
+            "paragraph",
+            "list",
+            "quote",
+            "code",
+            "table",
+            "image",
+            "unknown"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "blockId",
+        "type",
+        "order",
+        "sourceLocator"
+      ],
+      "title": "Block",
+      "type": "object"
+    },
+    "InlineSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "href": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Href"
+        },
+        "marks": {
+          "items": {
+            "enum": [
+              "strong",
+              "emphasis",
+              "code"
+            ],
+            "type": "string"
+          },
+          "title": "Marks",
+          "type": "array"
+        },
+        "sourceHref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sourcehref"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "InlineSpan",
+      "type": "object"
+    },
+    "ListItem": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "title": "Content",
+          "type": "string"
+        },
+        "inlines": {
+          "items": {
+            "$ref": "#/$defs/InlineSpan"
+          },
+          "title": "Inlines",
+          "type": "array"
+        }
+      },
+      "required": [
+        "content"
+      ],
+      "title": "ListItem",
+      "type": "object"
+    },
+    "Message": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/$defs/Severity"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "suggestion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggestion"
+        }
+      },
+      "required": [
+        "code",
+        "level",
+        "message"
+      ],
+      "title": "Message",
+      "type": "object"
+    },
+    "Metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "accountName": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Accountname"
+        },
+        "author": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Author"
+        },
+        "importedAt": {
+          "title": "Importedat",
+          "type": "string"
+        },
+        "modifiedAt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modifiedat"
+        },
+        "modifiedAtRaw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modifiedatraw"
+        },
+        "originalUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Originalurl"
+        },
+        "publishedAt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publishedat"
+        },
+        "publishedAtRaw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publishedatraw"
+        },
+        "sourceType": {
+          "enum": [
+            "wechat_saved_html",
+            "zhihu_column_saved_html"
+          ],
+          "title": "Sourcetype",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "accountName",
+        "author",
+        "publishedAt",
+        "publishedAtRaw",
+        "originalUrl",
+        "sourceType",
+        "importedAt"
+      ],
+      "title": "Metadata",
+      "type": "object"
+    },
+    "Processing": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter": {
+          "enum": [
+            "wechat_saved_html",
+            "zhihu_column_saved_html"
+          ],
+          "title": "Adapter",
+          "type": "string"
+        },
+        "adapterVersion": {
+          "title": "Adapterversion",
+          "type": "string"
+        },
+        "detectionEvidence": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detectionevidence"
+        },
+        "messages": {
+          "items": {
+            "$ref": "#/$defs/Message"
+          },
+          "title": "Messages",
+          "type": "array"
+        },
+        "statistics": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Statistics",
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "completed_with_warnings",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "adapter",
+        "adapterVersion",
+        "status",
+        "statistics",
+        "messages"
+      ],
+      "title": "Processing",
+      "type": "object"
+    },
+    "RevisionInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "assetFingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Assetfingerprintsha256",
+          "type": "string"
+        },
+        "contentFingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contentfingerprintsha256",
+          "type": "string"
+        },
+        "fingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Fingerprintsha256",
+          "type": "string"
+        },
+        "fingerprintVersion": {
+          "minLength": 1,
+          "title": "Fingerprintversion",
+          "type": "string"
+        },
+        "packageSha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Packagesha256"
+        },
+        "revisionId": {
+          "pattern": "^revision-[0-9a-f]{16}$",
+          "title": "Revisionid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revisionId",
+        "fingerprintSha256",
+        "contentFingerprintSha256",
+        "assetFingerprintSha256",
+        "fingerprintVersion"
+      ],
+      "title": "RevisionInfo",
+      "type": "object"
+    },
+    "Severity": {
+      "enum": [
+        "error",
+        "warning",
+        "info"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "archiveFileName": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Archivefilename"
+        },
+        "archiveSha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Archivesha256"
+        },
+        "htmlArchivePath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Htmlarchivepath"
+        },
+        "htmlEncoding": {
+          "title": "Htmlencoding",
+          "type": "string"
+        },
+        "htmlFileName": {
+          "title": "Htmlfilename",
+          "type": "string"
+        },
+        "htmlSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Htmlsha256",
+          "type": "string"
+        },
+        "resourceArchivePath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resourcearchivepath"
+        },
+        "resourceDirectoryName": {
+          "title": "Resourcedirectoryname",
+          "type": "string"
+        }
+      },
+      "required": [
+        "htmlFileName",
+        "resourceDirectoryName",
+        "htmlSha256",
+        "htmlEncoding"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "SourceIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "enum": [
+            "high",
+            "unresolved"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "method": {
+          "minLength": 1,
+          "title": "Method",
+          "type": "string"
+        },
+        "nativeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nativeid"
+        },
+        "normalizationVersion": {
+          "minLength": 1,
+          "title": "Normalizationversion",
+          "type": "string"
+        },
+        "normalizedValue": {
+          "minLength": 1,
+          "title": "Normalizedvalue",
+          "type": "string"
+        },
+        "rawValue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rawvalue"
+        },
+        "reliable": {
+          "title": "Reliable",
+          "type": "boolean"
+        },
+        "sourceType": {
+          "enum": [
+            "wechat_saved_html",
+            "zhihu_column_saved_html"
+          ],
+          "title": "Sourcetype",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sourceType",
+        "rawValue",
+        "normalizedValue",
+        "method",
+        "normalizationVersion",
+        "confidence",
+        "reliable"
+      ],
+      "title": "SourceIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assetCompleteness": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AssetCompleteness"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "assets": {
+      "items": {
+        "$ref": "#/$defs/Asset"
+      },
+      "title": "Assets",
+      "type": "array"
+    },
+    "blocks": {
+      "items": {
+        "$ref": "#/$defs/Block"
+      },
+      "title": "Blocks",
+      "type": "array"
+    },
+    "documentId": {
+      "pattern": "^(wechat|zhihu)-[0-9a-f]{16}$",
+      "title": "Documentid",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "processing": {
+      "$ref": "#/$defs/Processing"
+    },
+    "revision": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RevisionInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "schemaVersion": {
+      "enum": [
+        "1.0.0",
+        "1.1.0",
+        "2.0.0"
+      ],
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "sourceIdentity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SourceIdentity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "documentId",
+    "metadata",
+    "source",
+    "blocks",
+    "assets",
+    "processing"
+  ],
+  "title": "Document",
+  "type": "object"
+}

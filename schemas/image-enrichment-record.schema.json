@@ -1,0 +1,866 @@
+{
+  "$defs": {
+    "ChartAxis": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ChartAxis",
+      "type": "object"
+    },
+    "ChartContent": {
+      "additionalProperties": false,
+      "properties": {
+        "axes": {
+          "items": {
+            "$ref": "#/$defs/ChartAxis"
+          },
+          "title": "Axes",
+          "type": "array"
+        },
+        "directObservations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Directobservations",
+          "type": "array"
+        },
+        "inferences": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Inferences",
+          "type": "array"
+        },
+        "keyValues": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Keyvalues",
+          "type": "array"
+        },
+        "legends": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Legends",
+          "type": "array"
+        },
+        "series": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Series",
+          "type": "array"
+        },
+        "textualClaims": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Textualclaims",
+          "type": "array"
+        },
+        "trends": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Trends",
+          "type": "array"
+        }
+      },
+      "title": "ChartContent",
+      "type": "object"
+    },
+    "CodeContent": {
+      "additionalProperties": false,
+      "properties": {
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "CodeContent",
+      "type": "object"
+    },
+    "EnrichmentAction": {
+      "enum": [
+        "exclude_from_retrieval",
+        "describe",
+        "transcribe_text",
+        "transcribe_code",
+        "extract_table",
+        "understand_chart",
+        "ocr_and_vision",
+        "decode_qr",
+        "manual_review"
+      ],
+      "title": "EnrichmentAction",
+      "type": "string"
+    },
+    "EnrichmentAttemptRecord": {
+      "additionalProperties": false,
+      "description": "One actual provider call made for an image task.",
+      "properties": {
+        "actualModel": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Actualmodel"
+        },
+        "attemptNumber": {
+          "minimum": 1,
+          "title": "Attemptnumber",
+          "type": "integer"
+        },
+        "completedAt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completedat"
+        },
+        "elapsedMs": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Elapsedms"
+        },
+        "errorCode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Errorcode"
+        },
+        "errorMessage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Errormessage"
+        },
+        "finishReason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finishreason"
+        },
+        "providerResponseReceived": {
+          "title": "Providerresponsereceived",
+          "type": "boolean"
+        },
+        "rawResponsePath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rawresponsepath"
+        },
+        "recoveryDetailsPath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recoverydetailspath"
+        },
+        "recoveryMode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recoverymode"
+        },
+        "requestId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Requestid"
+        },
+        "status": {
+          "$ref": "#/$defs/RunStatus"
+        },
+        "structuredRetryNumber": {
+          "minimum": 0,
+          "title": "Structuredretrynumber",
+          "type": "integer"
+        },
+        "transportRetryNumber": {
+          "minimum": 0,
+          "title": "Transportretrynumber",
+          "type": "integer"
+        },
+        "usage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Usage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "validationIssues": {
+          "anyOf": [
+            {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Validationissues"
+        },
+        "validationStatus": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Validationstatus"
+        }
+      },
+      "required": [
+        "attemptNumber",
+        "structuredRetryNumber",
+        "transportRetryNumber",
+        "status",
+        "providerResponseReceived"
+      ],
+      "title": "EnrichmentAttemptRecord",
+      "type": "object"
+    },
+    "EnrichmentResult": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/EnrichmentAction"
+        },
+        "chart": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChartContent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "code": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CodeContent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "extractedText": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Extractedtext"
+        },
+        "imageType": {
+          "$ref": "#/$defs/ImageType"
+        },
+        "keyFacts": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Keyfacts",
+          "type": "array"
+        },
+        "knowledgeValue": {
+          "$ref": "#/$defs/KnowledgeValue"
+        },
+        "retrievalDecision": {
+          "$ref": "#/$defs/RetrievalDecision"
+        },
+        "schemaVersion": {
+          "const": "1.0.0",
+          "title": "Schemaversion",
+          "type": "string"
+        },
+        "table": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TableContent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "uncertainties": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Uncertainties",
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "imageType",
+        "knowledgeValue",
+        "action",
+        "retrievalDecision"
+      ],
+      "title": "EnrichmentResult",
+      "type": "object"
+    },
+    "ImageType": {
+      "enum": [
+        "architecture_flow",
+        "table",
+        "chart",
+        "code",
+        "ui_screenshot",
+        "text_image",
+        "decorative_text",
+        "qr_code",
+        "photo_scene",
+        "logo_mark",
+        "other"
+      ],
+      "title": "ImageType",
+      "type": "string"
+    },
+    "KnowledgeValue": {
+      "enum": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "context_dependent"
+      ],
+      "title": "KnowledgeValue",
+      "type": "string"
+    },
+    "RetrievalDecision": {
+      "enum": [
+        "include",
+        "exclude",
+        "manual_review"
+      ],
+      "title": "RetrievalDecision",
+      "type": "string"
+    },
+    "ReviewStatus": {
+      "enum": [
+        "pending",
+        "needs_review",
+        "approved",
+        "rejected"
+      ],
+      "title": "ReviewStatus",
+      "type": "string"
+    },
+    "RunStatus": {
+      "enum": [
+        "success",
+        "cached",
+        "dry_run",
+        "policy_rejected",
+        "skipped",
+        "invalid_output",
+        "timeout",
+        "rate_limited",
+        "authentication_failed",
+        "provider_error"
+      ],
+      "title": "RunStatus",
+      "type": "string"
+    },
+    "TableContent": {
+      "additionalProperties": false,
+      "properties": {
+        "headers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Headers",
+          "type": "array"
+        },
+        "mergedCells": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Mergedcells",
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "textRepresentation": {
+          "minLength": 1,
+          "title": "Textrepresentation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "textRepresentation"
+      ],
+      "title": "TableContent",
+      "type": "object"
+    },
+    "Usage": {
+      "additionalProperties": false,
+      "properties": {
+        "cachedInputTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cachedinputtokens"
+        },
+        "imageTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Imagetokens"
+        },
+        "inputTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inputtokens"
+        },
+        "outputTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Outputtokens"
+        },
+        "totalTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Totaltokens"
+        }
+      },
+      "title": "Usage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actualModel": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Actualmodel"
+    },
+    "attemptRecords": {
+      "items": {
+        "$ref": "#/$defs/EnrichmentAttemptRecord"
+      },
+      "title": "Attemptrecords",
+      "type": "array"
+    },
+    "attempts": {
+      "minimum": 0,
+      "title": "Attempts",
+      "type": "integer"
+    },
+    "cacheKey": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Cachekey",
+      "type": "string"
+    },
+    "contextFingerprintSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contextfingerprintsha256",
+      "type": "string"
+    },
+    "elapsedMs": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Elapsedms"
+    },
+    "enableThinking": {
+      "title": "Enablethinking",
+      "type": "boolean"
+    },
+    "errorCode": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Errorcode"
+    },
+    "errorMessage": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Errormessage"
+    },
+    "imageSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Imagesha256",
+      "type": "string"
+    },
+    "processedAt": {
+      "title": "Processedat",
+      "type": "string"
+    },
+    "processingProfile": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Processingprofile"
+    },
+    "processor": {
+      "title": "Processor",
+      "type": "string"
+    },
+    "promptSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Promptsha256",
+      "type": "string"
+    },
+    "promptVersion": {
+      "title": "Promptversion",
+      "type": "string"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "rawResponsePath": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rawresponsepath"
+    },
+    "requestId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Requestid"
+    },
+    "requestedModel": {
+      "title": "Requestedmodel",
+      "type": "string"
+    },
+    "result": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EnrichmentResult"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "resultSchemaVersion": {
+      "title": "Resultschemaversion",
+      "type": "string"
+    },
+    "retryCount": {
+      "minimum": 0,
+      "title": "Retrycount",
+      "type": "integer"
+    },
+    "reviewStatus": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReviewStatus"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "schemaVersion": {
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ],
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/RunStatus"
+    },
+    "structuredRetryCount": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Structuredretrycount",
+      "type": "integer"
+    },
+    "taskUsage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Usage"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "transportRetryCount": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Transportretrycount",
+      "type": "integer"
+    },
+    "usage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Usage"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "validationStatus": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Validationstatus"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "cacheKey",
+    "imageSha256",
+    "status",
+    "processor",
+    "provider",
+    "requestedModel",
+    "promptVersion",
+    "promptSha256",
+    "resultSchemaVersion",
+    "processedAt",
+    "contextFingerprintSha256",
+    "attempts",
+    "retryCount",
+    "enableThinking"
+  ],
+  "title": "EnrichmentRunRecord",
+  "type": "object"
+}

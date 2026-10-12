@@ -1,0 +1,259 @@
+{
+  "$defs": {
+    "AssetReference": {
+      "additionalProperties": false,
+      "properties": {
+        "assetId": {
+          "minLength": 1,
+          "title": "Assetid",
+          "type": "string"
+        },
+        "binarySha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Binarysha256",
+          "type": "string"
+        },
+        "documentId": {
+          "minLength": 1,
+          "title": "Documentid",
+          "type": "string"
+        },
+        "revisionId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revisionid"
+        }
+      },
+      "required": [
+        "documentId",
+        "assetId",
+        "binarySha256"
+      ],
+      "title": "AssetReference",
+      "type": "object"
+    },
+    "DataPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "allowExternal": {
+          "title": "Allowexternal",
+          "type": "boolean"
+        },
+        "allowedBackendTypes": {
+          "items": {
+            "enum": [
+              "cloud",
+              "local"
+            ],
+            "type": "string"
+          },
+          "title": "Allowedbackendtypes",
+          "type": "array"
+        },
+        "classification": {
+          "enum": [
+            "external_test_sample",
+            "formal_asset",
+            "local_only"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "localOnly": {
+          "title": "Localonly",
+          "type": "boolean"
+        },
+        "policyVersion": {
+          "minLength": 1,
+          "title": "Policyversion",
+          "type": "string"
+        },
+        "reasonCode": {
+          "minLength": 1,
+          "title": "Reasoncode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "allowExternal",
+        "localOnly",
+        "allowedBackendTypes",
+        "classification",
+        "policyVersion",
+        "reasonCode"
+      ],
+      "title": "DataPolicy",
+      "type": "object"
+    },
+    "ImageContext": {
+      "additionalProperties": false,
+      "properties": {
+        "articleTitle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Articletitle"
+        },
+        "available": {
+          "title": "Available",
+          "type": "boolean"
+        },
+        "caption": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption"
+        },
+        "followingText": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Followingtext"
+        },
+        "precedingText": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Precedingtext"
+        }
+      },
+      "required": [
+        "available"
+      ],
+      "title": "ImageContext",
+      "type": "object"
+    },
+    "ImageIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "actualFormat": {
+          "minLength": 1,
+          "title": "Actualformat",
+          "type": "string"
+        },
+        "height": {
+          "minimum": 1,
+          "title": "Height",
+          "type": "integer"
+        },
+        "mediaType": {
+          "pattern": "^image/[a-z0-9.+-]+$",
+          "title": "Mediatype",
+          "type": "string"
+        },
+        "relativePath": {
+          "minLength": 1,
+          "title": "Relativepath",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "sizeBytes": {
+          "minimum": 1,
+          "title": "Sizebytes",
+          "type": "integer"
+        },
+        "width": {
+          "minimum": 1,
+          "title": "Width",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "sha256",
+        "relativePath",
+        "mediaType",
+        "actualFormat",
+        "sizeBytes",
+        "width",
+        "height"
+      ],
+      "title": "ImageIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assetReferences": {
+      "items": {
+        "$ref": "#/$defs/AssetReference"
+      },
+      "title": "Assetreferences",
+      "type": "array"
+    },
+    "context": {
+      "$ref": "#/$defs/ImageContext"
+    },
+    "contextFingerprintSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Contextfingerprintsha256",
+      "type": "string"
+    },
+    "image": {
+      "$ref": "#/$defs/ImageIdentity"
+    },
+    "policy": {
+      "$ref": "#/$defs/DataPolicy"
+    },
+    "promptVersion": {
+      "minLength": 1,
+      "title": "Promptversion",
+      "type": "string"
+    },
+    "resultSchemaVersion": {
+      "const": "1.0.0",
+      "title": "Resultschemaversion",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1.0.0",
+      "title": "Schemaversion",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "image",
+    "context",
+    "contextFingerprintSha256",
+    "policy",
+    "promptVersion",
+    "resultSchemaVersion"
+  ],
+  "title": "EnrichmentRequest",
+  "type": "object"
+}

@@ -1,0 +1,249 @@
+{
+  "$defs": {
+    "AssetCompleteness": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "minimum": 0,
+          "title": "Available",
+          "type": "integer"
+        },
+        "completenessRate": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Completenessrate",
+          "type": "number"
+        },
+        "expected": {
+          "minimum": 0,
+          "title": "Expected",
+          "type": "integer"
+        },
+        "invalid": {
+          "minimum": 0,
+          "title": "Invalid",
+          "type": "integer"
+        },
+        "invalidAssetIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidassetids",
+          "type": "array"
+        },
+        "missing": {
+          "minimum": 0,
+          "title": "Missing",
+          "type": "integer"
+        },
+        "missingAssetIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missingassetids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "expected",
+        "available",
+        "missing",
+        "invalid",
+        "completenessRate",
+        "missingAssetIds",
+        "invalidAssetIds"
+      ],
+      "title": "AssetCompleteness",
+      "type": "object"
+    },
+    "SourceIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "enum": [
+            "high",
+            "unresolved"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "method": {
+          "minLength": 1,
+          "title": "Method",
+          "type": "string"
+        },
+        "nativeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nativeid"
+        },
+        "normalizationVersion": {
+          "minLength": 1,
+          "title": "Normalizationversion",
+          "type": "string"
+        },
+        "normalizedValue": {
+          "minLength": 1,
+          "title": "Normalizedvalue",
+          "type": "string"
+        },
+        "rawValue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rawvalue"
+        },
+        "reliable": {
+          "title": "Reliable",
+          "type": "boolean"
+        },
+        "sourceType": {
+          "enum": [
+            "wechat_saved_html",
+            "zhihu_column_saved_html"
+          ],
+          "title": "Sourcetype",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sourceType",
+        "rawValue",
+        "normalizedValue",
+        "method",
+        "normalizationVersion",
+        "confidence",
+        "reliable"
+      ],
+      "title": "SourceIdentity",
+      "type": "object"
+    },
+    "StoredRevision": {
+      "additionalProperties": false,
+      "properties": {
+        "assetCompleteness": {
+          "$ref": "#/$defs/AssetCompleteness"
+        },
+        "assetFingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Assetfingerprintsha256",
+          "type": "string"
+        },
+        "contentFingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contentfingerprintsha256",
+          "type": "string"
+        },
+        "decisionAtCreation": {
+          "title": "Decisionatcreation",
+          "type": "string"
+        },
+        "fingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Fingerprintsha256",
+          "type": "string"
+        },
+        "htmlSha256s": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Htmlsha256S",
+          "type": "array"
+        },
+        "importedAt": {
+          "title": "Importedat",
+          "type": "string"
+        },
+        "packageSha256s": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Packagesha256S",
+          "type": "array"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "revisionId": {
+          "pattern": "^revision-[0-9a-f]{16}$",
+          "title": "Revisionid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revisionId",
+        "fingerprintSha256",
+        "contentFingerprintSha256",
+        "assetFingerprintSha256",
+        "packageSha256s",
+        "htmlSha256s",
+        "importedAt",
+        "path",
+        "assetCompleteness",
+        "decisionAtCreation"
+      ],
+      "title": "StoredRevision",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "currentRevisionId": {
+      "pattern": "^revision-[0-9a-f]{16}$",
+      "title": "Currentrevisionid",
+      "type": "string"
+    },
+    "directoryName": {
+      "title": "Directoryname",
+      "type": "string"
+    },
+    "documentId": {
+      "pattern": "^(wechat|zhihu)-[0-9a-f]{16}$",
+      "title": "Documentid",
+      "type": "string"
+    },
+    "revisions": {
+      "items": {
+        "$ref": "#/$defs/StoredRevision"
+      },
+      "title": "Revisions",
+      "type": "array"
+    },
+    "schemaVersion": {
+      "const": "1.0.0",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "sourceIdentity": {
+      "$ref": "#/$defs/SourceIdentity"
+    },
+    "titleAtCreation": {
+      "title": "Titleatcreation",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "documentId",
+    "sourceIdentity",
+    "directoryName",
+    "titleAtCreation",
+    "currentRevisionId",
+    "revisions"
+  ],
+  "title": "DocumentRecord",
+  "type": "object"
+}

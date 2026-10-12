@@ -1,0 +1,485 @@
+{
+  "$defs": {
+    "BatchRunItem": {
+      "additionalProperties": false,
+      "properties": {
+        "cacheKey": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Cachekey",
+          "type": "string"
+        },
+        "errorCode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Errorcode"
+        },
+        "imageSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Imagesha256",
+          "type": "string"
+        },
+        "recordPath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recordpath"
+        },
+        "relativePath": {
+          "title": "Relativepath",
+          "type": "string"
+        },
+        "requestPath": {
+          "title": "Requestpath",
+          "type": "string"
+        },
+        "reviewStatus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReviewStatus"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "status": {
+          "$ref": "#/$defs/RunStatus"
+        }
+      },
+      "required": [
+        "imageSha256",
+        "relativePath",
+        "cacheKey",
+        "status",
+        "requestPath"
+      ],
+      "title": "BatchRunItem",
+      "type": "object"
+    },
+    "BatchRunMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "apiCalls": {
+          "minimum": 0,
+          "title": "Apicalls",
+          "type": "integer"
+        },
+        "apiCallsWithUsage": {
+          "minimum": 0,
+          "title": "Apicallswithusage",
+          "type": "integer"
+        },
+        "apiCallsWithoutUsage": {
+          "minimum": 0,
+          "title": "Apicallswithoutusage",
+          "type": "integer"
+        },
+        "cacheHits": {
+          "minimum": 0,
+          "title": "Cachehits",
+          "type": "integer"
+        },
+        "finalFailures": {
+          "minimum": 0,
+          "title": "Finalfailures",
+          "type": "integer"
+        },
+        "firstAttemptSuccesses": {
+          "minimum": 0,
+          "title": "Firstattemptsuccesses",
+          "type": "integer"
+        },
+        "imageTasks": {
+          "minimum": 0,
+          "title": "Imagetasks",
+          "type": "integer"
+        },
+        "pendingReview": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pendingreview"
+        },
+        "resultRecoveryAttempts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resultrecoveryattempts"
+        },
+        "retrySuccesses": {
+          "minimum": 0,
+          "title": "Retrysuccesses",
+          "type": "integer"
+        },
+        "structuredOutputFailures": {
+          "minimum": 0,
+          "title": "Structuredoutputfailures",
+          "type": "integer"
+        },
+        "structuredRetrySuccesses": {
+          "minimum": 0,
+          "title": "Structuredretrysuccesses",
+          "type": "integer"
+        },
+        "transportRecoveryAttempts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Transportrecoveryattempts"
+        }
+      },
+      "required": [
+        "imageTasks",
+        "apiCalls",
+        "firstAttemptSuccesses",
+        "retrySuccesses",
+        "structuredRetrySuccesses",
+        "finalFailures",
+        "structuredOutputFailures",
+        "cacheHits",
+        "apiCallsWithUsage",
+        "apiCallsWithoutUsage"
+      ],
+      "title": "BatchRunMetrics",
+      "type": "object"
+    },
+    "ReviewStatus": {
+      "enum": [
+        "pending",
+        "needs_review",
+        "approved",
+        "rejected"
+      ],
+      "title": "ReviewStatus",
+      "type": "string"
+    },
+    "RunStatus": {
+      "enum": [
+        "success",
+        "cached",
+        "dry_run",
+        "policy_rejected",
+        "skipped",
+        "invalid_output",
+        "timeout",
+        "rate_limited",
+        "authentication_failed",
+        "provider_error"
+      ],
+      "title": "RunStatus",
+      "type": "string"
+    },
+    "Usage": {
+      "additionalProperties": false,
+      "properties": {
+        "cachedInputTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cachedinputtokens"
+        },
+        "imageTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Imagetokens"
+        },
+        "inputTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inputtokens"
+        },
+        "outputTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Outputtokens"
+        },
+        "totalTokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Totaltokens"
+        }
+      },
+      "title": "Usage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actualModels": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Actualmodels",
+      "type": "array"
+    },
+    "completedAt": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Completedat"
+    },
+    "configurationFingerprintSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Configurationfingerprintsha256",
+      "type": "string"
+    },
+    "createdAt": {
+      "title": "Createdat",
+      "type": "string"
+    },
+    "dataset": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Dataset",
+      "type": "object"
+    },
+    "dryRun": {
+      "title": "Dryrun",
+      "type": "boolean"
+    },
+    "enableThinking": {
+      "title": "Enablethinking",
+      "type": "boolean"
+    },
+    "endpoint": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Endpoint"
+    },
+    "force": {
+      "title": "Force",
+      "type": "boolean"
+    },
+    "inventorySha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Inventorysha256",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/BatchRunItem"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "metrics": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BatchRunMetrics"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "notes": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Notes",
+      "type": "array"
+    },
+    "processingProfile": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Processingprofile"
+    },
+    "profileConfiguration": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Profileconfiguration"
+    },
+    "promptSha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Promptsha256",
+      "type": "string"
+    },
+    "promptVersion": {
+      "title": "Promptversion",
+      "type": "string"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "region": {
+      "title": "Region",
+      "type": "string"
+    },
+    "requestedModel": {
+      "title": "Requestedmodel",
+      "type": "string"
+    },
+    "resultSchemaVersion": {
+      "title": "Resultschemaversion",
+      "type": "string"
+    },
+    "runId": {
+      "title": "Runid",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ],
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "in_progress",
+        "completed",
+        "dry_run",
+        "blocked",
+        "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "summary": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Summary",
+      "type": "object"
+    },
+    "usage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Usage"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "runId",
+    "status",
+    "createdAt",
+    "provider",
+    "requestedModel",
+    "region",
+    "promptVersion",
+    "promptSha256",
+    "resultSchemaVersion",
+    "inventorySha256",
+    "configurationFingerprintSha256",
+    "enableThinking",
+    "force",
+    "dryRun",
+    "dataset",
+    "summary",
+    "items"
+  ],
+  "title": "BatchRunManifest",
+  "type": "object"
+}

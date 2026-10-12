@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "mappingVersion": "image-router-benchmark-mapping-v1",
+  "humanTypeToExperimentType": {
+    "结构／流程图": "diagram_or_flowchart",
+    "表格": "table",
+    "坐标／统计图": "chart_or_plot",
+    "代码截图": "code_screenshot",
+    "界面截图": "ui_screenshot",
+    "普通文字图": "plain_text_or_decorative_text",
+    "装饰文字": "plain_text_or_decorative_text",
+    "二维码": "qr_code",
+    "Logo／标志": "logo_or_icon",
+    "其他": "other_or_uncertain"
+  },
+  "photoRules": {
+    "humanType": "照片／场景图",
+    "decorativeActions": [
+      "仅归档／不进入检索"
+    ],
+    "decorativeKnowledgeValues": [
+      "无"
+    ],
+    "decorativeType": "decorative_image",
+    "otherwiseType": "informative_photo"
+  },
+  "humanActionToRoute": {
+    "二维码解码": "local_qr",
+    "OCR": "local_ocr",
+    "代码转写": "cloud_code",
+    "表格提取": "cloud_structured_visual",
+    "图表理解": "cloud_structured_visual",
+    "OCR＋视觉理解": "cloud_structured_visual",
+    "视觉描述": "cloud_visual_description",
+    "仅归档／不进入检索": "skip_candidate",
+    "人工复核": "uncertain",
+    "待判断": "uncertain"
+  },
+  "mediumHighKnowledgeValues": [
+    "中",
+    "高"
+  ],
+  "complexRoutes": [
+    "cloud_code",
+    "cloud_structured_visual"
+  ]
+}

@@ -1,0 +1,3 @@
+# Prompt identities hash exact bytes. Keep Markdown LF on every platform,
+# including Windows installations with core.autocrlf=true.
+*.md text eol=lf
