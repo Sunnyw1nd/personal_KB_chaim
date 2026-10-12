@@ -1,18 +1,27 @@
-# 个人知识库：静态文章导入工具
+# 个人知识库：本地资料处理工具
 
-把浏览器保存的微信公众号或知乎专栏文章，离线转换为结构化 JSON 和便于阅读的 Markdown。
-处理过程不会执行网页脚本，也不会联网下载资源。
+将保存的微信公众号、知乎专栏文章转成带修订历史的JSON与Markdown，并提供独立图片标注、
+可审核的云端图片处理、只读观察台和本地操作工作台。多格式导入和检索仍在规划中。
+
+## 使用本地工作台
+
+```powershell
+python -m pip install -e ".[workbench]"
+kb-workbench
+```
+
+打开 `http://127.0.0.1:8765/`，拖入文章ZIP，查看修订，选择正文图后显式识别，再审核或保存人工
+修改。默认不会调用模型；密钥只留后端。终端Ctrl+C停止。[完整操作与数据说明](docs/workbench.md)。
 
 ## 快速开始
 
-环境要求：Python 3.11 或更高版本。
+需要Python 3.11或更高版本。在项目根目录安装：
 
 ```powershell
 python -m pip install -e .
 ```
 
-自行创建 `samples/`，将下载后的 ZIP 放入其中，然后一次转换全部样本。
-GitHub 仓库不附带真实文章、测试图片或密钥：
+自行创建`samples/`，放入浏览器完整保存的文章ZIP，然后批量转换：
 
 ```powershell
 kb-normalize --normalize-samples `
@@ -21,95 +30,43 @@ kb-normalize --normalize-samples `
   --output-directory output/documents
 ```
 
-命令会自动解压、复用有效缓存、识别文章来源并继续处理其他文件。某个 ZIP 无法识别时，
-它会出现在汇总报告中，不会影响其余文章。
+原始资料不修改，不执行网页脚本，也不联网补图。GitHub不附带真实文章、图片或密钥。
+同一文章重新保存/补图仍归入原逻辑文档，旧修订保留。
 
-## 查看结果
+## 结果在哪里
 
-每篇文章会进入一个可读、稳定的目录，例如：
+打开`output/documents/batch-processing-report.json`，按每项`outputPath`找到修订目录：
 
-```text
-output/documents/
-├── batch-processing-report.json
-├── weixin-文章标题--<短ID>/
-└── zhihu-文章标题--<短ID>/
-```
+- `document.md`阅读正文；`document.json`是标准结果；
+- `assets/`查看正文图片；两个report/manifest文件解释警告与资源处理。
 
-从批量报告的 `outputPath` 打开当前导入对应的修订，主要查看：
+若某项失败，查看批量报告的错误；其他成功项仍保留。只承诺微信静态文章与知乎静态专栏，
+其他页面不使用通用正文回退。单篇命令、current与常见问题见[完整指南](docs/usage.md)。
 
-- `document.md`：阅读和人工核对；
-- `document.json`：后续知识库处理的正式数据；
-- `processing-report.json`：警告和处理统计；
-- `resource-manifest.json`：资源采用或排除原因；
-- `assets/`：正文图片。
+## 图片功能
 
-同一文章再次保存或补齐图片后仍归入原目录；历史修订会保留，不会破坏性覆盖。
-
-## 转换单篇已解压文章
-
-```powershell
-kb-normalize "文章标题.html" "文章标题_files" output
-```
-
-目前支持微信公众号静态文章和知乎静态专栏文章。其他页面会明确报告为不支持，不会使用低
-可信的通用网页提取。
-
-## 更多文档
-
-- [完整使用指南](docs/usage.md)
-- [源码发布与本机资料范围](docs/github-publication.md)
-- [稳定身份与修订管理](docs/revision-management.md)
-- [解析器与数据结构设计](docs/design.md)
-- [真实样本验证记录](docs/real-sample-validation.md)
-- [开发与测试报告](docs/development-report.md)
-- [人工验收清单](docs/acceptance-checklist.md)
-- [图片 Enrichment 使用指南](docs/image-enrichment.md)
-- [图片观察台与存储审计](docs/image-enrichment-observer.md)
-- [第五轮图片 Enrichment 验证](docs/image-enrichment-validation.md)
-- [第七轮六图校准验证](docs/image-enrichment-round7-validation.md)
-- [本地图片路由器隔离验证](docs/image-router-benchmark-validation.md)
-
-## 图片辅助标注
-
-将图片放入 `test_pictures/`，生成带缩略图和下拉选项的 Excel：
+图片标注需要自行准备`test_pictures/`：
 
 ```powershell
 python -m pip install -e ".[annotation]"
 python -m wechat_html_normalizer.image_annotation --input test_pictures --output output/image-annotation
 ```
 
-打开命令返回目录中的 `图片辅助标注.xlsx` 开始填写。再次生成会创建新目录，保留已有标注。
-操作步骤与限制见[图片标注说明](docs/image-annotation.md)。
-
-## 图片云端基线
-
-先安装可选依赖并确认即将外发的范围（dry-run 不联网）：
-
-```powershell
-python -m pip install -e ".[enrichment]"
-kb-enrich-images run --dry-run --max-images 3
-```
-
-确认图片允许发送后，在项目根目录 `.env` 的 `DASHSCOPE_API_KEY=` 后填入密钥，并显式加入
-`--allow-external` 才会调用百炼。也可以使用同名环境变量，完整说明见下方文档。
-机器结果单独写入 `output/image-enrichment/`，不会改写文章 JSON、Markdown 或人工工作簿。
-严格结构化输出校验失败时默认最多受控重试一次，逐次证据和 usage 会分开保留。
-完整命令、安全边界和评测方法见[图片 Enrichment 使用指南](docs/image-enrichment.md)。
-
-可选的精简普通 JSON 配置先这样预演：
-
-```powershell
-kb-enrich-images run --profile compact-json-v1 --dry-run --max-images 3
-```
-
-该配置提供有限次数的错误恢复，生成结果仍需质量审核；默认配置暂不切换。
-运行、审核和恢复命令见[精简 JSON 使用说明](docs/image-enrichment-compact.md)。
-
-已有图片运行记录可离线生成观察台，再双击输出的 `index.html` 查看：
+打开返回目录中的`图片辅助标注.xlsx`填写；再次生成不会覆盖原标注。
+云端图片处理需[准备图片清单和凭据](docs/image-enrichment.md)，显式允许外发才会发送图片，
+结果仍需审核。已有运行数据可离线生成观察台：
 
 ```powershell
 kb-enrich-images observe build
 ```
 
-入口是 `output/image-enrichment/observer/index.html`；观察台只读、不调用模型，详情见
-[图片观察台与存储审计](docs/image-enrichment-observer.md)。
+双击`output/image-enrichment/observer/index.html`查看；没有图片清单或历史运行时，请先按图片
+指南准备。观察台仍只读；导入/识别/编辑请用上述工作台。
+
+## 更多文档
+
+- [完整文档导航](docs/index.md)：使用、契约、实验与验证；
+- [图片标注](docs/image-annotation.md)、[图片处理](docs/image-enrichment.md)、
+  [精简JSON可选配置](docs/image-enrichment-compact.md)、[观察台](docs/image-enrichment-observer.md)；
+- [当前架构](docs/architecture.md)、[本地工作台路线](docs/roadmap.md)；
+- [源码发布与本机数据](docs/github-publication.md)。

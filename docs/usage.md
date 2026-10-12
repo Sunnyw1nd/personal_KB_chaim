@@ -196,7 +196,9 @@ print(result.import_decision, result.current_revision_id)
 - 浏览器完整保存、具有可靠专栏结构的知乎专栏文章。
 
 不支持知乎问题、回答、想法、动态骨架、MHTML、通用博客、GitHub Pages、PDF、TXT、Markdown、
-OCR、图片或视频理解、Chunk、Embedding、检索和 RAG。来源无法可靠识别时返回
+视频理解、Chunk、Embedding、检索和 RAG。这里是**文章导入**范围；独立图片标注、可选云端
+Enrichment及只读观察台已经实现，但不等于导入器内置OCR或多格式支持。图片操作见
+[图片使用指南](image-enrichment.md)和[可选精简配置](image-enrichment-compact.md)。来源无法可靠识别时返回
 `source_unsupported`，不使用任意网页正文回退。
 
 ## 9. 常见问题

@@ -77,7 +77,8 @@ def cache_key(
 
 def _atomic_json(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    # Same-directory atomic publication without repeating long final filenames.
+    temp = path.with_name(f".{uuid.uuid4().hex}.tmp")
     temp.write_text(
         json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",

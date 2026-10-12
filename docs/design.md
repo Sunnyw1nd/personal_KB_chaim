@@ -1,5 +1,8 @@
 # 静态文章标准化设计说明
 
+本文件侧重HTML与早期阶段设计，完整当前职责/规划见[架构导航](architecture.md)。后文“本轮”
+表示相应历史阶段范围，不等于当前全项目能力；阶段实测记录不因整理而改写。
+
 ## 边界与数据流
 
 公开入口 `normalize_saved_article(html_path, resource_directory, output_directory)` 表示一个
@@ -139,7 +142,7 @@ SHA-256。组合指纹还包含 Schema、适配器及规则版本。资源清单
 
 ### 批量编排
 
-`batch.py` 的 `normalize_sample_archives` 复用上述准备接口和正式
+`application/importing.py` 的 `normalize_sample_archives`（旧`batch.py`保留兼容导出）复用上述准备接口和正式
 `normalize_saved_article`，按大小写无关的稳定文件名顺序扫描 `samples` 顶层全部 ZIP。
 每项独立完成准备、自动来源识别和标准输出；一个 ZIP 的准备或来源识别失败只形成该项失败，
 不会回滚或阻断其他文章。批量层不实现新的网页回退，也不重新解释适配器结果。

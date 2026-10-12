@@ -20,14 +20,17 @@ dependencies = [
 dev = ["pytest>=8,<10", "ruff>=0.6,<1"]
 annotation = ["openpyxl>=3.1.5,<4"]
 enrichment = ["openai>=2.14,<3", "openpyxl>=3.1.5,<4"]
+workbench = ["Flask>=3.1,<4", "openai>=2.14,<3"]
 
 [project.scripts]
 wechat-normalize = "wechat_html_normalizer.cli:main"
 kb-normalize = "wechat_html_normalizer.cli:main"
 kb-enrich-images = "wechat_html_normalizer.enrichment.cli:main"
+kb-workbench = "wechat_html_normalizer.workbench.server:main"
 
 [tool.setuptools.package-data]
 "wechat_html_normalizer.enrichment" = ["prompts/*.md", "observer_assets/*.css", "observer_assets/*.js"]
+"wechat_html_normalizer.workbench" = ["assets/*.html", "assets/*.css", "assets/*.js"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

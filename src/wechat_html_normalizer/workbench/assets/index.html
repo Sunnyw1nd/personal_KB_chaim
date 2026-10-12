@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>个人知识库 · 本地工作台</title><link rel="stylesheet" href="/static/observer.css"><link rel="stylesheet" href="/static/app.css">
+<script src="/static/app.js" defer></script></head><body>
+<header><span class="brand">个人知识库 · 本地工作台</span><span id="keyStatus"></span><span id="actor"></span></header>
+<main><div id="message" role="status" class="notice">正在读取本机数据；不会自动识图。</div>
+<section class="panel"><h1>1. 导入文章</h1><p>选择或拖入浏览器保存的ZIP。原文件不修改；新上传副本单独保存。</p>
+<input id="upload" type="file" accept=".zip" multiple><div id="drop">也可拖放 ZIP 到这里</div><div id="importResult"></div></section>
+<div class="layout"><aside class="panel"><h2>2. 文档与修订</h2><input id="search" placeholder="按标题或来源搜索"><div id="documents"></div></aside>
+<section class="panel"><h2 id="title">选择一篇文档</h2><select id="revision" aria-label="修订版本"></select>
+<div id="completeness"></div><details><summary>处理警告与资源清单</summary><pre id="reports"></pre></details>
+<details open><summary>标准化正文（不执行原HTML）</summary><article id="body"></article></details>
+</section></div>
+<section class="panel"><h2>3. 正文图片任务</h2><p>同图不同上下文分开处理；下面显示实际将使用的受限上下文。缓存命中不代表人工已认可。</p>
+<div id="pictures"></div><div id="excluded"></div>
+<label><input id="consent" type="checkbox"> 我确认所选图片及下方上下文允许发送到百炼北京API</label>
+<p id="budget">尚未选择图片。</p><button id="enrich">确认选择并识别／复用缓存</button>
+<button id="rerun">新任务再次运行（仍优先缓存）</button></section>
+<section class="panel"><h2>4. 原图、审核与人工修改</h2><div id="review"></div></section>
+<section class="panel"><h2>后台任务</h2><p>刷新只读取状态；重启中断项不会自动重发。离线恢复仅汇总已存证据。</p><div id="tasks"></div></section>
+</main></body></html>

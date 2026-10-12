@@ -742,6 +742,7 @@ def run_compact_batch(
     requests_per_minute: float = 12,
     sleep: Callable[[float], None] = time.sleep,
     clock: Callable[[], float] = time.monotonic,
+    execution_call_limit: int | None = None,
 ) -> tuple[Path, BatchRunManifest]:
     config = profile_config(
         model=model,
@@ -751,6 +752,13 @@ def run_compact_batch(
         hard_token_limit=hard_token_limit,
         task_timeout=task_timeout,
     )
+    call_budget = config["maxBatchCalls"] if execution_call_limit is None else execution_call_limit
+    if execution_call_limit is not None and (
+        not isinstance(call_budget, int)
+        or isinstance(call_budget, bool)
+        or not 0 <= call_budget <= 3 * len(prepared)
+    ):
+        raise ValueError("execution call limit must be between zero and 3 * selected tasks")
     if any(_linked(p) for p in (output_root, *output_root.parents)):
         raise ValueError("linked output root is not allowed")
     output_root = output_root.resolve()
@@ -796,6 +804,7 @@ def run_compact_batch(
             "Machine validation is separate from human approval; no benchmark was read during inference.",
             "At most 3 actual calls per image: one first call, one transport recovery and one result recovery.",
             "Unknown usage is reported separately; a timeout may still have been billed by the service.",
+            f"Execution call limit: {call_budget}; scheduling budget does not change cache identity.",
         ],
     )
     _write(
@@ -858,10 +867,7 @@ def run_compact_batch(
             batch_item = BatchRunItem(**common, status="dry_run")
         elif provider is None:
             batch_item = BatchRunItem(**common, status="skipped", errorCode="provider_unavailable")
-        elif (
-            len(list((directory / "tasks").glob("*/attempt-*.reservation.json")))
-            >= config["maxBatchCalls"]
-        ):
+        elif len(list((directory / "tasks").glob("*/attempt-*.reservation.json"))) >= call_budget:
             batch_item = BatchRunItem(
                 **common, status="skipped", errorCode="batch_call_budget_exhausted"
             )
@@ -882,7 +888,7 @@ def run_compact_batch(
                 sleep=sleep,
                 call_limit=min(
                     3,
-                    config["maxBatchCalls"]
+                    call_budget
                     - len(list((directory / "tasks").glob("*/attempt-*.reservation.json"))),
                 ),
             )

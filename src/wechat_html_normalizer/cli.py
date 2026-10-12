@@ -6,7 +6,7 @@ import json
 import sys
 from pathlib import Path
 
-from .batch import BatchNormalizationError, normalize_sample_archives
+from .application.importing import BatchNormalizationError, normalize_sample_archives
 from .migration import MigrationPreviewError, preview_legacy_outputs
 from .models import Document, DocumentRecord, ProcessingReport, ResourceManifest
 from .normalizer import (

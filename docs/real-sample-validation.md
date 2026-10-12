@@ -2,6 +2,10 @@
 
 第一轮验证日期：2026-08-12；第二轮复核日期：2026-08-24（Asia/Shanghai）
 
+第十三轮导航核查：前三篇的旧SHA目录在当前本机已不可访问，下面保留当时路径作为历史记录，
+不再提供失效链接。本轮没有删除或搬迁它们；当前稳定身份/修订见后文第三轮记录，以及
+[managed-samples导入报告](../output/managed-samples/batch-processing-report.json)。历史ID和实测数字不改写。
+
 ## 输入安全检查
 
 | ZIP | SHA-256 | 条目数 | 解压大小 | 压缩倍率 | 路径穿越/加密/符号链接 |
@@ -27,7 +31,7 @@
 - 资源：正文图 7；样式表 23；正文外页面图片 6；脚本 4；辅助 HTML 1。
 - 处理状态：`completed_with_warnings`。
 - 正文人工抽查：开头、结尾、6 个三级标题与原始静态 DOM 一致；7 张图片顺序为 `640` 至 `640(6)`，Markdown 中均位于相应正文位置且可解码。
-- 输出：[wechat-04ed2205bb9a70f6](../output/real-samples/wechat-04ed2205bb9a70f6/)
+- 当时输出：`output/real-samples/wechat-04ed2205bb9a70f6/`（当前不可访问，历史路径保留）。
 
 ## 样本二
 
@@ -42,7 +46,7 @@
 - 资源：正文图 4；样式表 23；正文外页面图片 6；脚本 4；辅助 HTML 1。
 - 处理状态：`completed`（存在 3 条正常安全决策 info）。
 - 正文人工抽查：开头、结尾、4 个二级标题及一张 4×2 表格与原始静态 DOM 一致；4 张 Markdown 图片均存在且可解码。
-- 输出：[wechat-d5bd23572d184478](../output/real-samples/wechat-d5bd23572d184478/)
+- 当时输出：`output/real-samples/wechat-d5bd23572d184478/`（当前不可访问，历史路径保留）。
 
 ## 资源排除与安全结论
 
@@ -95,7 +99,7 @@
   固定 `importedAt` 后在两个新输出目录重复执行，`document.json` 与 `document.md` 逐字节一致。
 - 原 ZIP 处理前后 SHA-256 一致。项目外附件 `E:\html\MCPzhihu.zip` 与 `samples` 副本哈希
   完全相同。
-- 输出：[zhihu-ef0808404d2029c7](../output/real-samples/zhihu-ef0808404d2029c7/)
+- 当时输出：`output/real-samples/zhihu-ef0808404d2029c7/`（当前不可访问，历史路径保留）。
 
 ## 批量转换验收
 

@@ -82,7 +82,9 @@ def _trim(value: str | None, limit: int = 500) -> str | None:
     return value[:limit] or None
 
 
-def _policy(path: Path | None, available_ids: set[str]) -> tuple[str, dict[str, dict]]:
+def _policy(
+    path: Path | None, available_ids: set[str], *, ignore_unrelated: bool = False
+) -> tuple[str, dict[str, dict]]:
     if path is None or not path.exists():
         return "default-v1", {}
     path = path.resolve(strict=True)
@@ -100,7 +102,7 @@ def _policy(path: Path | None, available_ids: set[str]) -> tuple[str, dict[str, 
     ):
         raise ValueError("image policy keys must be lowercase SHA-256 and rules must be objects")
     unknown = sorted(set(value["images"]) - available_ids)
-    if unknown:
+    if unknown and not ignore_unrelated:
         raise ValueError(
             "image policy contains imageId absent from inventory: " + ", ".join(unknown)
         )

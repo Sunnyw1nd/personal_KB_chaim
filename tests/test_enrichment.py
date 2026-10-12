@@ -201,7 +201,7 @@ def test_env_file_is_ignored_and_example_contains_no_key() -> None:
     ignore = (root / ".gitignore").read_text(encoding="utf-8")
     example = (root / ".env.example").read_text(encoding="utf-8")
     assert ".env\n" in ignore
-    assert "!.env.example" in ignore
+    assert {"!.env.example", "!/.env.example"} & set(ignore.splitlines())
     assert example.splitlines()[-1] == "DASHSCOPE_API_KEY="
 
 

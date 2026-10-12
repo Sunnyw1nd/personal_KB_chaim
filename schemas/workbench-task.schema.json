@@ -1,0 +1,105 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "taskId": {
+      "pattern": "^[0-9a-f]{32}$",
+      "title": "Taskid",
+      "type": "string"
+    },
+    "operation": {
+      "enum": [
+        "import",
+        "enrichment"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "scopeFingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Scopefingerprint",
+      "type": "string"
+    },
+    "requestId": {
+      "maxLength": 100,
+      "title": "Requestid",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "queued",
+        "running",
+        "completed",
+        "completed_with_errors",
+        "blocked",
+        "interrupted",
+        "recovered"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "createdAt": {
+      "title": "Createdat",
+      "type": "string"
+    },
+    "scope": {
+      "additionalProperties": true,
+      "title": "Scope",
+      "type": "object"
+    },
+    "callBudget": {
+      "minimum": 0,
+      "title": "Callbudget",
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "runIds": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Runids",
+      "type": "array"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error"
+    },
+    "updatedAt": {
+      "title": "Updatedat",
+      "type": "string"
+    }
+  },
+  "required": [
+    "taskId",
+    "operation",
+    "scopeFingerprint",
+    "requestId",
+    "state",
+    "createdAt",
+    "scope",
+    "callBudget",
+    "updatedAt"
+  ],
+  "title": "WorkbenchTask",
+  "type": "object"
+}

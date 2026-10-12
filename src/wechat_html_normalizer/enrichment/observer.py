@@ -16,13 +16,14 @@ from typing import Any
 from PIL import Image
 
 from ..media import sha256_file
-from .cli import DEFAULT_MODEL, DEFAULT_PROMPT_PATH, PROMPT_VERSION
 from .dataset import prepare_dataset
 from .evaluation import read_benchmark
 from .models import BatchRunManifest, EnrichmentRunRecord
+from .providers import DEFAULT_MODEL
 from .reviews import read_review
 from .runner import cache_key, inspect_cache, load_prompt
 from .security import redact_sensitive_object
+from .settings import DEFAULT_PROMPT_PATH, PROMPT_VERSION
 
 INDEX_VERSION = "1.0.0"
 MAX_JSON_BYTES = 10 * 1024 * 1024
