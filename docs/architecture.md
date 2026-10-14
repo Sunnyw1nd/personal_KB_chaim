@@ -9,6 +9,12 @@
 第十三轮规划背景，其中“工作台/正式图片桥接尚缺”已由本轮实现；具体当前契约见
 [工作台指南](workbench.md)。同图多位置按上下文分组，完整位置保存在任务绑定，不依赖工作簿。
 
+第十五轮增量：`application/local_imports.py`集中TXT/Markdown/独立图片的只读解析、安全资源
+关联及显式本地身份。`Workbench.import_files`统一上传动作，保存页仍走原normalizer，所有来源
+共用`storage.publish_revision`和正式修订图片桥接。新来源不是伪HTML；新增LocalSource、Document3.0
+及Record1.1，运行时读取旧契约。下方第十三轮职责表中HTML专用/多格式未实现的说明是历史规划，
+当前范围和可测试限制以[本地输入指南](local-inputs.md)为准，Office/PDF与检索仍未实现。
+
 ## 命名选择
 
 本轮选择**保留现有包，按职责逐步整理**。展示名使用“个人知识库”，发布包名

@@ -4,7 +4,8 @@
 
 ## 使用入口
 
-- [本地工作台](workbench.md)：ZIP→修订→正文图→显式识别→独立审核/编辑；
+- [本地工作台](workbench.md)：导入→修订→正文图→显式识别→独立审核/编辑；
+- [本地TXT/Markdown/图片](local-inputs.md)：输入集合、编码、重复与显式更新、新旧契约；
 
 - [文章导入完整指南](usage.md)：单篇、批量、ZIP、修订及错误；
 - [图片标注](image-annotation.md)、[图片处理](image-enrichment.md)、
@@ -31,6 +32,7 @@
 - [第十二轮精简JSON与恢复](image-enrichment-round12-validation.md)；
 - [第十三轮整理验证](repository-round13-validation.md)。
 - [第十四轮工作台验证](workbench-round14-validation.md)。
+- [第十五轮本地输入验证](local-inputs-round15-validation.md)。
 
 历史中的“未使用Git”“本轮不做OCR”等是对应阶段事实或范围。当前规则以AGENTS、当前工单及
 有效使用指南为准；历史实测数字、模型原文与版本不重写。私人运行附件仍在原位，公开仓库可能

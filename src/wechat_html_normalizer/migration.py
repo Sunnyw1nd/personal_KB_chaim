@@ -32,6 +32,8 @@ class MigrationPreviewError(RuntimeError):
 
 def _identity(document: Document) -> SourceIdentityValue:
     source_type = document.metadata.source_type
+    if source_type.startswith("local_"):
+        raise ValueError("Local managed sources are not legacy saved-page migration candidates")
     if source_type == "wechat_saved_html":
         identity = normalize_wechat_identity(document.metadata.original_url)
     else:

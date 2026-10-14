@@ -25,7 +25,7 @@ def _safe_link(value: str) -> str | None:
     return value.replace(" ", "%20").replace("(", "%28").replace(")", "%29")
 
 
-def _inline(spans: list[InlineSpan] | None, fallback: str) -> str:
+def _inline(spans: list[InlineSpan] | None, fallback: str, *, literal_join: bool = False) -> str:
     if not spans:
         return fallback
     output: list[str] = []
@@ -42,17 +42,21 @@ def _inline(spans: list[InlineSpan] | None, fallback: str) -> str:
         if safe_href:
             text = f"[{text}]({safe_href})"
         output.append(text)
-    return " ".join(output).replace("\n", "  \n")
+    return ("" if literal_join else " ").join(output).replace("\n", "  \n")
 
 
-def _table(block: Block) -> str:
+def _table(block: Block, *, literal: bool = False) -> str:
     rows = block.rows or []
     if not rows:
         return ""
     width = max(len(row) for row in rows)
     normalized = [row + [""] * (width - len(row)) for row in rows]
     escaped = [
-        [cell.replace("|", "\\|").replace("\n", "<br>") for cell in row] for row in normalized
+        [
+            (_escape(cell) if literal else cell).replace("|", "\\|").replace("\n", "<br>")
+            for cell in row
+        ]
+        for row in normalized
     ]
     header = escaped[0]
     body = escaped[1:]
@@ -98,23 +102,46 @@ def render_markdown(document: Document) -> str:
     lines.extend(["", "---", ""])
 
     assets = {asset.asset_id: asset for asset in document.assets}
+    local = document.schema_version == "3.0.0"
     for block in document.blocks:
+        if block.plain_text:
+            # A literal fence prevents #, numbering and indentation in TXT from becoming markup.
+            runs = [len(m.group()) for m in re.finditer(r"`+", block.content or "")]
+            fence = "`" * max(3, max(runs, default=0) + 1)
+            lines.extend([fence + "text", block.content or "", fence, ""])
+            continue
         if block.type == "heading":
-            lines.append(f"{'#' * (block.level or 2)} {_escape(block.content or '')}")
+            heading = (
+                _inline(block.inlines, block.content or "", literal_join=True)
+                if local
+                else _escape(block.content or "")
+            )
+            lines.append(f"{'#' * (block.level or 2)} {heading}")
         elif block.type == "paragraph":
-            lines.append(_inline(block.inlines, block.content or ""))
+            lines.append(_inline(block.inlines, block.content or "", literal_join=local))
         elif block.type == "list":
             for index, item in enumerate(block.items or [], 1):
-                marker = f"{index}." if block.ordered else "-"
-                lines.append(f"{marker} {_inline(item.inlines, item.content)}")
+                marker = (
+                    f"{item.number if item.number is not None else index}."
+                    if (item.ordered if item.ordered is not None else block.ordered)
+                    else "-"
+                )
+                lines.append(
+                    f"{'    ' * (item.depth or 0)}{marker} {_inline(item.inlines, item.content, literal_join=local)}"
+                )
         elif block.type == "quote":
-            lines.extend(f"> {line}" for line in (block.content or "").splitlines())
+            quote = (
+                _inline(block.inlines, block.content or "", literal_join=True)
+                if local
+                else block.content or ""
+            )
+            lines.extend(f"> {line}" for line in quote.splitlines())
         elif block.type == "code":
             runs = [len(match.group(0)) for match in re.finditer(r"`+", block.content or "")]
             fence = "`" * max(3, (max(runs) + 1) if runs else 3)
             lines.extend([f"{fence}{block.language or ''}", block.content or "", fence])
         elif block.type == "table":
-            lines.append(_table(block))
+            lines.append(_table(block, literal=local))
         elif block.type == "image":
             asset = assets[block.asset_id or ""]
             original = asset.original_file_name or asset.local_src or "未知"
@@ -128,7 +155,9 @@ def render_markdown(document: Document) -> str:
             if block.caption:
                 lines.extend(["", f"> 图注：{_inline(block.caption_inlines, block.caption)}"])
         else:
-            if block.original_tag == "video":
+            if local and block.original_tag == "thematic_break":
+                lines.append("---")
+            elif block.original_tag == "video":
                 lines.append(f"> [嵌入视频待支持] {_escape(block.content or '')}")
                 safe_source = _safe_link(block.source_url) if block.source_url else None
                 if safe_source:

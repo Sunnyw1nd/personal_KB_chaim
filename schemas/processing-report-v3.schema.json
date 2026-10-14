@@ -1,0 +1,538 @@
+{
+  "$defs": {
+    "AssetCompleteness": {
+      "additionalProperties": false,
+      "properties": {
+        "expected": {
+          "minimum": 0,
+          "title": "Expected",
+          "type": "integer"
+        },
+        "available": {
+          "minimum": 0,
+          "title": "Available",
+          "type": "integer"
+        },
+        "missing": {
+          "minimum": 0,
+          "title": "Missing",
+          "type": "integer"
+        },
+        "invalid": {
+          "minimum": 0,
+          "title": "Invalid",
+          "type": "integer"
+        },
+        "completenessRate": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Completenessrate",
+          "type": "number"
+        },
+        "missingAssetIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missingassetids",
+          "type": "array"
+        },
+        "invalidAssetIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Invalidassetids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "expected",
+        "available",
+        "missing",
+        "invalid",
+        "completenessRate",
+        "missingAssetIds",
+        "invalidAssetIds"
+      ],
+      "title": "AssetCompleteness",
+      "type": "object"
+    },
+    "Message": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/$defs/Severity"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Location"
+        },
+        "suggestion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggestion"
+        }
+      },
+      "required": [
+        "code",
+        "level",
+        "message"
+      ],
+      "title": "Message",
+      "type": "object"
+    },
+    "Metadata": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "accountName": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Accountname"
+        },
+        "author": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Author"
+        },
+        "publishedAt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publishedat"
+        },
+        "publishedAtRaw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publishedatraw"
+        },
+        "originalUrl": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Originalurl"
+        },
+        "modifiedAt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modifiedat"
+        },
+        "modifiedAtRaw": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modifiedatraw"
+        },
+        "sourceType": {
+          "enum": [
+            "wechat_saved_html",
+            "zhihu_column_saved_html",
+            "local_text",
+            "local_markdown",
+            "local_image"
+          ],
+          "title": "Sourcetype",
+          "type": "string"
+        },
+        "importedAt": {
+          "title": "Importedat",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "accountName",
+        "author",
+        "publishedAt",
+        "publishedAtRaw",
+        "originalUrl",
+        "sourceType",
+        "importedAt"
+      ],
+      "title": "Metadata",
+      "type": "object"
+    },
+    "OutputLocations": {
+      "additionalProperties": false,
+      "properties": {
+        "documentJson": {
+          "title": "Documentjson",
+          "type": "string"
+        },
+        "documentMarkdown": {
+          "title": "Documentmarkdown",
+          "type": "string"
+        },
+        "processingReport": {
+          "title": "Processingreport",
+          "type": "string"
+        },
+        "resourceManifest": {
+          "title": "Resourcemanifest",
+          "type": "string"
+        },
+        "assetsDirectory": {
+          "title": "Assetsdirectory",
+          "type": "string"
+        }
+      },
+      "required": [
+        "documentJson",
+        "documentMarkdown",
+        "processingReport",
+        "resourceManifest",
+        "assetsDirectory"
+      ],
+      "title": "OutputLocations",
+      "type": "object"
+    },
+    "RevisionInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "revisionId": {
+          "pattern": "^revision-[0-9a-f]{16}$",
+          "title": "Revisionid",
+          "type": "string"
+        },
+        "fingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Fingerprintsha256",
+          "type": "string"
+        },
+        "contentFingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contentfingerprintsha256",
+          "type": "string"
+        },
+        "assetFingerprintSha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Assetfingerprintsha256",
+          "type": "string"
+        },
+        "packageSha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Packagesha256"
+        },
+        "fingerprintVersion": {
+          "minLength": 1,
+          "title": "Fingerprintversion",
+          "type": "string"
+        }
+      },
+      "required": [
+        "revisionId",
+        "fingerprintSha256",
+        "contentFingerprintSha256",
+        "assetFingerprintSha256",
+        "fingerprintVersion"
+      ],
+      "title": "RevisionInfo",
+      "type": "object"
+    },
+    "Severity": {
+      "enum": [
+        "error",
+        "warning",
+        "info"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "SourceIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "sourceType": {
+          "enum": [
+            "wechat_saved_html",
+            "zhihu_column_saved_html",
+            "local_text",
+            "local_markdown",
+            "local_image"
+          ],
+          "title": "Sourcetype",
+          "type": "string"
+        },
+        "rawValue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rawvalue"
+        },
+        "normalizedValue": {
+          "minLength": 1,
+          "title": "Normalizedvalue",
+          "type": "string"
+        },
+        "nativeId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nativeid"
+        },
+        "method": {
+          "minLength": 1,
+          "title": "Method",
+          "type": "string"
+        },
+        "normalizationVersion": {
+          "minLength": 1,
+          "title": "Normalizationversion",
+          "type": "string"
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "unresolved"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "reliable": {
+          "title": "Reliable",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "sourceType",
+        "rawValue",
+        "normalizedValue",
+        "method",
+        "normalizationVersion",
+        "confidence",
+        "reliable"
+      ],
+      "title": "SourceIdentity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "enum": [
+        "1.0.0",
+        "1.1.0",
+        "2.0.0",
+        "3.0.0"
+      ],
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "documentId": {
+      "title": "Documentid",
+      "type": "string"
+    },
+    "adapter": {
+      "title": "Adapter",
+      "type": "string"
+    },
+    "adapterVersion": {
+      "title": "Adapterversion",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "completed",
+        "completed_with_warnings",
+        "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "inputSummary": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "Inputsummary",
+      "type": "object"
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "statistics": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Statistics",
+      "type": "object"
+    },
+    "excludedRegions": {
+      "items": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "title": "Excludedregions",
+      "type": "array"
+    },
+    "messages": {
+      "items": {
+        "$ref": "#/$defs/Message"
+      },
+      "title": "Messages",
+      "type": "array"
+    },
+    "outputs": {
+      "$ref": "#/$defs/OutputLocations"
+    },
+    "detectionEvidence": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Detectionevidence"
+    },
+    "sourceIdentity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SourceIdentity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "revision": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RevisionInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "assetCompleteness": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AssetCompleteness"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "documentId",
+    "adapter",
+    "adapterVersion",
+    "status",
+    "inputSummary",
+    "metadata",
+    "statistics",
+    "excludedRegions",
+    "messages",
+    "outputs"
+  ],
+  "title": "ProcessingReport",
+  "type": "object"
+}

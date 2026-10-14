@@ -17,6 +17,12 @@ class Severity(StrEnum):
     INFO = "info"
 
 
+SourceType = Literal[
+    "wechat_saved_html", "zhihu_column_saved_html", "local_text", "local_markdown", "local_image"
+]
+DOCUMENT_ID_PATTERN = r"^(wechat|zhihu|local)-[0-9a-f]{16}$"
+
+
 class Message(StrictModel):
     code: str
     level: Severity
@@ -38,12 +44,12 @@ class Metadata(StrictModel):
     modified_at_raw: str | None = Field(
         default=None, alias="modifiedAtRaw", exclude_if=lambda value: value is None
     )
-    source_type: Literal["wechat_saved_html", "zhihu_column_saved_html"] = Field(alias="sourceType")
+    source_type: SourceType = Field(alias="sourceType")
     imported_at: str = Field(alias="importedAt")
 
 
 class SourceIdentity(StrictModel):
-    source_type: Literal["wechat_saved_html", "zhihu_column_saved_html"] = Field(alias="sourceType")
+    source_type: SourceType = Field(alias="sourceType")
     raw_value: str | None = Field(alias="rawValue")
     normalized_value: str = Field(alias="normalizedValue", min_length=1)
     native_id: str | None = Field(default=None, alias="nativeId")
@@ -106,6 +112,19 @@ class Source(StrictModel):
     )
 
 
+class LocalSource(StrictModel):
+    format: Literal["text", "markdown", "image"]
+    input_file_name: str = Field(alias="inputFileName")
+    input_sha256: str = Field(alias="inputSha256", pattern=r"^[0-9a-f]{64}$")
+    input_set_sha256: str = Field(alias="inputSetSha256", pattern=r"^[0-9a-f]{64}$")
+    encoding: str | None = None
+    media_type: str = Field(alias="mediaType")
+    title_method: str = Field(alias="titleMethod")
+    main_path: str = Field(alias="mainPath")
+    archive_sha256: str | None = Field(default=None, alias="archiveSha256")
+    import_origin: Literal["local_file", "markdown_bundle"] = Field(alias="importOrigin")
+
+
 class InlineSpan(StrictModel):
     text: str
     href: str | None = None
@@ -118,6 +137,9 @@ class InlineSpan(StrictModel):
 class ListItem(StrictModel):
     content: str
     inlines: list[InlineSpan] = Field(default_factory=list)
+    depth: int | None = Field(default=None, ge=0, alias="depth", exclude_if=lambda v: v is None)
+    ordered: bool | None = Field(default=None, exclude_if=lambda v: v is None)
+    number: int | None = Field(default=None, ge=0, exclude_if=lambda v: v is None)
 
 
 class Block(StrictModel):
@@ -141,6 +163,7 @@ class Block(StrictModel):
     source_url: str | None = Field(
         default=None, alias="sourceUrl", exclude_if=lambda value: value is None
     )
+    plain_text: bool | None = Field(default=None, alias="plainText", exclude_if=lambda v: v is None)
 
     @model_validator(mode="after")
     def validate_shape(self) -> Block:
@@ -201,7 +224,7 @@ class Asset(StrictModel):
 
 
 class Processing(StrictModel):
-    adapter: Literal["wechat_saved_html", "zhihu_column_saved_html"]
+    adapter: SourceType
     adapter_version: str = Field(alias="adapterVersion")
     status: Literal["completed", "completed_with_warnings", "failed"]
     statistics: dict[str, int]
@@ -212,8 +235,8 @@ class Processing(StrictModel):
 
 
 class Document(StrictModel):
-    schema_version: Literal["1.0.0", "1.1.0", "2.0.0"] = Field(alias="schemaVersion")
-    document_id: str = Field(alias="documentId", pattern=r"^(wechat|zhihu)-[0-9a-f]{16}$")
+    schema_version: Literal["1.0.0", "1.1.0", "2.0.0", "3.0.0"] = Field(alias="schemaVersion")
+    document_id: str = Field(alias="documentId", pattern=DOCUMENT_ID_PATTERN)
     source_identity: SourceIdentity | None = Field(
         default=None, alias="sourceIdentity", exclude_if=lambda value: value is None
     )
@@ -222,19 +245,28 @@ class Document(StrictModel):
         default=None, alias="assetCompleteness", exclude_if=lambda value: value is None
     )
     metadata: Metadata
-    source: Source
+    source: Source | LocalSource
     blocks: list[Block]
     assets: list[Asset]
     processing: Processing
 
     @model_validator(mode="after")
     def validate_references(self) -> Document:
-        if self.schema_version == "2.0.0" and not all(
+        if self.schema_version in {"2.0.0", "3.0.0"} and not all(
             (self.source_identity, self.revision, self.asset_completeness)
         ):
             raise ValueError(
                 "schema 2.0.0 requires sourceIdentity, revision, and assetCompleteness"
             )
+        if isinstance(self.source, LocalSource):
+            if self.schema_version != "3.0.0" or not self.document_id.startswith("local-"):
+                raise ValueError("local sources require schema 3.0.0 and local identity")
+            if self.metadata.source_type != f"local_{self.source.format}":
+                raise ValueError("local format and source type disagree")
+        elif self.metadata.source_type.startswith("local_"):
+            raise ValueError("local files must not be represented as HTML")
+        elif self.document_id.startswith("local-"):
+            raise ValueError("local identity requires a LocalSource")
         block_ids = [block.block_id for block in self.blocks]
         asset_ids = [asset.asset_id for asset in self.assets]
         if len(block_ids) != len(set(block_ids)):
@@ -265,7 +297,7 @@ class ResourceEntry(StrictModel):
 
 
 class ResourceManifest(StrictModel):
-    schema_version: Literal["1.0.0", "1.1.0", "2.0.0"] = Field(alias="schemaVersion")
+    schema_version: Literal["1.0.0", "1.1.0", "2.0.0", "3.0.0"] = Field(alias="schemaVersion")
     document_id: str = Field(alias="documentId")
     resources: list[ResourceEntry]
 
@@ -279,7 +311,7 @@ class OutputLocations(StrictModel):
 
 
 class ProcessingReport(StrictModel):
-    schema_version: Literal["1.0.0", "1.1.0", "2.0.0"] = Field(alias="schemaVersion")
+    schema_version: Literal["1.0.0", "1.1.0", "2.0.0", "3.0.0"] = Field(alias="schemaVersion")
     document_id: str = Field(alias="documentId")
     adapter: str
     adapter_version: str = Field(alias="adapterVersion")
@@ -311,6 +343,12 @@ class StoredRevision(StrictModel):
     asset_fingerprint_sha256: str = Field(alias="assetFingerprintSha256", pattern=r"^[0-9a-f]{64}$")
     package_sha256s: list[str] = Field(alias="packageSha256s")
     html_sha256s: list[str] = Field(alias="htmlSha256s")
+    input_sha256s: list[str] | None = Field(
+        default=None, alias="inputSha256s", exclude_if=lambda v: v is None
+    )
+    input_set_sha256s: list[str] | None = Field(
+        default=None, alias="inputSetSha256s", exclude_if=lambda v: v is None
+    )
     imported_at: str = Field(alias="importedAt")
     path: str
     asset_completeness: AssetCompleteness = Field(alias="assetCompleteness")
@@ -318,8 +356,8 @@ class StoredRevision(StrictModel):
 
 
 class DocumentRecord(StrictModel):
-    schema_version: Literal["1.0.0"] = Field(alias="schemaVersion")
-    document_id: str = Field(alias="documentId", pattern=r"^(wechat|zhihu)-[0-9a-f]{16}$")
+    schema_version: Literal["1.0.0", "1.1.0"] = Field(alias="schemaVersion")
+    document_id: str = Field(alias="documentId", pattern=DOCUMENT_ID_PATTERN)
     source_identity: SourceIdentity = Field(alias="sourceIdentity")
     directory_name: str = Field(alias="directoryName")
     title_at_creation: str = Field(alias="titleAtCreation")
@@ -328,6 +366,8 @@ class DocumentRecord(StrictModel):
 
     @model_validator(mode="after")
     def validate_current(self) -> DocumentRecord:
+        if self.document_id.startswith("local-") and self.schema_version != "1.1.0":
+            raise ValueError("local document records require schema 1.1.0")
         ids = [item.revision_id for item in self.revisions]
         if len(ids) != len(set(ids)):
             raise ValueError("revisionId values must be unique")

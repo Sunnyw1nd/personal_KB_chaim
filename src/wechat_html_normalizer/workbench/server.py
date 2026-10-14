@@ -16,7 +16,7 @@ ASSETS = Path(__file__).with_name("assets")
 def create_app(core: Workbench, *, port: int = 8765) -> Flask:
     app = Flask(__name__, static_folder=None)
     app.config.update(
-        MAX_CONTENT_LENGTH=100 * 1024 * 1024, MAX_FORM_MEMORY_SIZE=500000, MAX_FORM_PARTS=32
+        MAX_CONTENT_LENGTH=100 * 1024 * 1024, MAX_FORM_MEMORY_SIZE=500000, MAX_FORM_PARTS=36
     )
     host = f"127.0.0.1:{port}"
     origin = f"http://{host}"
@@ -140,8 +140,27 @@ def create_app(core: Workbench, *, port: int = 8765) -> Flask:
         uploaded = request.files.getlist("files")
         if not 1 <= len(uploaded) <= 30:
             raise ValueError("select 1 to 30 ZIPs")
-        rows = [core.save_upload(item.filename or "", item.stream) for item in uploaded]
-        return reply(core.import_archives(rows, request.form.get("requestId", "")))
+        rows = []
+        for item in uploaded:
+            try:
+                rows.append(core.save_upload(item.filename or "", item.stream))
+            except (ValueError, OSError) as error:
+                rows.append(
+                    {
+                        "originalName": item.filename or "",
+                        "error": str(error) if isinstance(error, ValueError) else "upload_failed",
+                    }
+                )
+        return reply(
+            core.import_files(
+                rows,
+                request.form.get("requestId", ""),
+                target_document_id=request.form.get("targetDocumentId") or None,
+                main_markdown=request.form.get("mainMarkdown") or None,
+                create_new=request.form.get("createNew") == "true",
+                encoding_hint=request.form.get("encoding") or None,
+            )
+        )
 
     @app.get("/api/tasks")
     def tasks():

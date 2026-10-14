@@ -25,10 +25,11 @@ from ..enrichment.reviews import read_review, set_review
 from ..enrichment.runner import _atomic_json, inspect_cache, load_prompt, stable_sha, utc_now
 from ..enrichment.security import redact_sensitive_object
 from ..enrichment.settings import DEFAULT_PROMPT_PATH, FROZEN_PROMPT_SHA256
-from ..models import DocumentRecord
+from ..models import DOCUMENT_ID_PATTERN, DocumentRecord
 from ..normalizer import normalize_saved_article
 from ..sample_cache import prepare_sample
 from .image_tasks import prepare_revision_images, safe_child
+from .local_imports import DuplicateCandidate, extract_markdown_bundle, import_local_file
 from .workbench_models import HumanRevision, WorkbenchTask
 
 
@@ -213,7 +214,9 @@ class Workbench:
                 result.append(
                     {
                         "documentId": record.document_id,
-                        "title": record.title_at_creation,
+                        "title": read_json(
+                            safe_child(checked.parent, revision.path + "/document.json")
+                        )["metadata"]["title"],
                         "source": record.source_identity.source_type,
                         "currentRevisionId": record.current_revision_id,
                         "completeness": revision.asset_completeness.model_dump(
@@ -228,7 +231,7 @@ class Workbench:
         return result
 
     def revision(self, document_id, revision_id=None):
-        if not re.fullmatch(r"(?:wechat|zhihu)-[0-9a-f]{16}", document_id):
+        if not re.fullmatch(DOCUMENT_ID_PATTERN, document_id):
             raise ValueError("invalid document ID")
         candidates = []
         for path in self.documents.glob("*/document-record.json"):
@@ -279,9 +282,12 @@ class Workbench:
         }
 
     def save_upload(self, name, stream):
-        name = name.replace("\\", "/").split("/")[-1][:250]
-        if not name.lower().endswith(".zip"):
-            raise ValueError("only saved-article ZIP uploads are supported")
+        name = name.replace("\\", "/").split("/")[-1]
+        if len(name) > 1000:
+            raise ValueError("upload name too long")
+        extension = Path(name).suffix.lower()
+        if not re.fullmatch(r"\.[a-z0-9]{1,12}", extension):
+            raise ValueError("unsupported upload type")
         temp = safe_child(self.data, f"uploads/tmp-{uuid.uuid4().hex}.zip", exists=False)
         temp.parent.mkdir(parents=True, exist_ok=True)
         sha = hashlib.sha256()
@@ -290,12 +296,12 @@ class Workbench:
             while chunk := stream.read(1024 * 1024):
                 size += len(chunk)
                 if size > 50 * 1024 * 1024:
-                    raise ValueError("ZIP upload exceeds 50 MiB")
+                    raise ValueError("upload exceeds 50 MiB")
                 sha.update(chunk)
                 output.write(chunk)
         digest = sha.hexdigest()
         # Keep the ZIP basename short: browser resource names can already be near MAX_PATH.
-        target = safe_child(self.data, f"uploads/{digest}/a.zip", exists=False)
+        target = safe_child(self.data, f"uploads/{digest}/a{extension}", exists=False)
         with self.lock:
             target.parent.mkdir(parents=True, exist_ok=True)
             if target.exists():
@@ -319,6 +325,113 @@ class Workbench:
                 },
             )
             return {"sha256": digest, "originalName": name, "sizeBytes": size}
+
+    def import_files(
+        self,
+        uploads,
+        request_id,
+        *,
+        target_document_id=None,
+        main_markdown=None,
+        create_new=False,
+        encoding_hint=None,
+    ):
+        if not uploads or len(uploads) > 30:
+            raise ValueError("select 1 to 30 supported files")
+        if target_document_id and len(uploads) != 1:
+            raise ValueError("update requires exactly one file or Markdown ZIP")
+        if target_document_id:
+            self.revision(target_document_id)
+        # Name is an input-format/display fact, not logical identity. Preserve mixed aliases explicitly.
+        selected = []
+        for row in uploads:
+            if row.get("error"):
+                selected.append((row, None))
+                continue
+            sha, name = row["sha256"], row["originalName"]
+            if not re.fullmatch(r"[0-9a-f]{64}", sha):
+                raise ValueError("invalid upload identity")
+            suffix = Path(name).suffix.lower()
+            path = safe_child(self.data, f"uploads/{sha}/a{suffix}")
+            if hashlib.sha256(path.read_bytes()).hexdigest() != sha:
+                raise ValueError("immutable upload integrity mismatch")
+            selected.append((row, path))
+        scope = {
+            "files": uploads,
+            "targetDocumentId": target_document_id,
+            "mainMarkdown": main_markdown,
+            "createNew": create_new,
+            "encoding": encoding_hint,
+        }
+
+        def worker(task):
+            for uploaded, path in selected:
+                if path is None:
+                    task["items"].append(uploaded)
+                    self._save_task(task)
+                    continue
+                row = {"inputSha256": uploaded["sha256"], "originalName": uploaded["originalName"]}
+                try:
+                    if path.suffix == ".zip" and not main_markdown:
+                        if target_document_id:
+                            raise ValueError(
+                                "HTML identity is source-derived; local updates require TXT/MD/image"
+                            )
+                        sample = prepare_sample(path, self.data / "uploads", self.work)
+                        result = normalize_saved_article(
+                            sample.html_path,
+                            sample.resource_directory,
+                            self.documents,
+                            source_sample=sample,
+                        )
+                        decision = result.import_decision
+                    else:
+                        if path.suffix == ".zip":
+                            root = extract_markdown_bundle(path, self.work)
+                            main = main_markdown
+                            if not main or Path(main).suffix.lower() not in {".md", ".markdown"}:
+                                raise ValueError("explicit_main_markdown_required")
+                            name = Path(main).name
+                        else:
+                            root, main, name = path.parent, path.name, uploaded["originalName"]
+                        result = import_local_file(
+                            root,
+                            main,
+                            self.documents,
+                            original_name=name,
+                            target_document_id=target_document_id,
+                            create_new=create_new,
+                            package_sha256=uploaded["sha256"] if path.suffix == ".zip" else None,
+                            encoding_hint=encoding_hint,
+                        )
+                        decision = result.decision
+                    row.update(
+                        title=result.document.metadata.title,
+                        sourceType=result.document.metadata.source_type,
+                        status=result.document.processing.status,
+                        documentId=result.document.document_id,
+                        revisionId=result.document.revision.revision_id,
+                        currentRevisionId=result.current_revision_id,
+                        decision=decision,
+                        completeness=result.document.asset_completeness.model_dump(
+                            mode="json", by_alias=True
+                        ),
+                        warningCount=len(result.document.processing.messages),
+                    )
+                except DuplicateCandidate as error:
+                    row.update(decision="duplicate_candidate", candidates=error.candidates)
+                except (OSError, ValueError, RuntimeError) as error:
+                    row.update(
+                        error=getattr(
+                            error,
+                            "code",
+                            str(error) if isinstance(error, ValueError) else type(error).__name__,
+                        )
+                    )
+                task["items"].append(row)
+                self._save_task(task)
+
+        return self._submit("import", scope, request_id, 0, worker, new_run=True)
 
     def _submit(self, operation, scope, request_id, budget, worker, *, new_run=False):
         if not isinstance(request_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", request_id):
