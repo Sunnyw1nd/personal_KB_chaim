@@ -13,6 +13,7 @@ from typing import Literal
 from .models import (
     Document,
     DocumentRecord,
+    LocalSource,
     ProcessingReport,
     ResourceManifest,
     StoredRevision,
@@ -107,7 +108,13 @@ def document_directory_name(
     output_root: Path | None = None,
     max_component_length: int = 96,
 ) -> str:
-    label = "weixin" if source_type == "wechat_saved_html" else "zhihu"
+    label = {
+        "wechat_saved_html": "weixin",
+        "zhihu_column_saved_html": "zhihu",
+        "local_text": "txt",
+        "local_markdown": "md",
+        "local_image": "image",
+    }[source_type]
     short_id = document_id.rsplit("-", 1)[-1][:10]
     suffix = f"--{short_id}"
     component_limit = max_component_length
@@ -176,7 +183,15 @@ def _stored_revision(document: Document, decision: str) -> StoredRevision:
         contentFingerprintSha256=document.revision.content_fingerprint_sha256,
         assetFingerprintSha256=document.revision.asset_fingerprint_sha256,
         packageSha256s=package_hashes,
-        htmlSha256s=[document.source.html_sha256],
+        htmlSha256s=[document.source.html_sha256]
+        if not isinstance(document.source, LocalSource)
+        else [],
+        inputSha256s=[document.source.input_sha256]
+        if isinstance(document.source, LocalSource)
+        else None,
+        inputSetSha256s=[document.source.input_set_sha256]
+        if isinstance(document.source, LocalSource)
+        else None,
         importedAt=document.metadata.imported_at,
         path=f"revisions/{document.revision.revision_id}",
         assetCompleteness=document.asset_completeness,
@@ -254,10 +269,19 @@ def _append_provenance(stored: StoredRevision, document: Document) -> StoredRevi
     html_hashes = list(stored.html_sha256s)
     if document.revision and document.revision.package_sha256:
         package_hashes.append(document.revision.package_sha256)
-    html_hashes.append(document.source.html_sha256)
+    local = isinstance(document.source, LocalSource)
+    if not local:
+        html_hashes.append(document.source.html_sha256)
     payload = stored.model_dump(mode="python", by_alias=True)
     payload["packageSha256s"] = sorted(set(package_hashes))
     payload["htmlSha256s"] = sorted(set(html_hashes))
+    if local:
+        payload["inputSha256s"] = sorted(
+            {*(stored.input_sha256s or []), document.source.input_sha256}
+        )
+        payload["inputSetSha256s"] = sorted(
+            {*(stored.input_set_sha256s or []), document.source.input_set_sha256}
+        )
     return StoredRevision.model_validate(payload)
 
 
@@ -315,7 +339,11 @@ def publish_revision(
             )
             same_direct_input = bool(
                 not document.revision.package_sha256
-                and document.source.html_sha256 in same.html_sha256s
+                and (
+                    document.source.input_set_sha256 in (same.input_set_sha256s or [])
+                    if isinstance(document.source, LocalSource)
+                    else document.source.html_sha256 in same.html_sha256s
+                )
             )
             updated = _append_provenance(same, document)
             decision: ImportDecision = (
@@ -399,7 +427,7 @@ def publish_revision(
     stored = _stored_revision(document, decision)
     if record is None:
         record = DocumentRecord(
-            schemaVersion="1.0.0",
+            schemaVersion="1.1.0" if isinstance(document.source, LocalSource) else "1.0.0",
             documentId=document.document_id,
             sourceIdentity=document.source_identity,
             directoryName=document_directory.name,

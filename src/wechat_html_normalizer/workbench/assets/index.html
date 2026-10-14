@@ -4,10 +4,14 @@
 <script src="/static/app.js" defer></script></head><body>
 <header><span class="brand">个人知识库 · 本地工作台</span><span id="keyStatus"></span><span id="actor"></span></header>
 <main><div id="message" role="status" class="notice">正在读取本机数据；不会自动识图。</div>
-<section class="panel"><h1>1. 导入文章</h1><p>选择或拖入浏览器保存的ZIP。原文件不修改；新上传副本单独保存。</p>
-<input id="upload" type="file" accept=".zip" multiple><div id="drop">也可拖放 ZIP 到这里</div><div id="importResult"></div></section>
+<section class="panel"><h1>1. 导入文档</h1><p>支持微信/知乎保存页ZIP、TXT、MD和JPEG/PNG/WebP。导入不会调用模型。MD有本地图片时，请打包MD及资源为ZIP，并填写主MD路径；浏览器不会自动读取旁边目录。</p>
+<label>Markdown ZIP主文件相对路径（保存页ZIP或单文件留空）：<input id="mainMarkdown" placeholder="例如 article.md 或 notes/article.md"></label>
+<label>TXT/MD编码：<select id="inputEncoding"><option value="">自动（非UTF中文默认GB18030，检测会提示复核）</option><option value="utf-8">UTF-8</option><option value="utf-8-sig">UTF-8 BOM</option><option value="utf-16">UTF-16</option><option value="gb18030">GB18030 / GBK</option><option value="big5">Big5</option></select></label>
+<input id="upload" type="file" accept=".zip,.txt,.md,.markdown,.jpg,.jpeg,.png,.webp" multiple><div id="drop">也可拖放支持的文件到这里</div><div id="importResult"></div></section>
 <div class="layout"><aside class="panel"><h2>2. 文档与修订</h2><input id="search" placeholder="按标题或来源搜索"><div id="documents"></div></aside>
 <section class="panel"><h2 id="title">选择一篇文档</h2><select id="revision" aria-label="修订版本"></select>
+<p id="sourceInfo"></p>
+<label id="updateLabel" hidden>导入新版本（明确更新当前逻辑文档；仅本地TXT/MD/图片）：<input id="updateUpload" type="file" accept=".txt,.md,.markdown,.zip,.jpg,.jpeg,.png,.webp"></label>
 <div id="completeness"></div><details><summary>处理警告与资源清单</summary><pre id="reports"></pre></details>
 <details open><summary>标准化正文（不执行原HTML）</summary><article id="body"></article></details>
 </section></div>

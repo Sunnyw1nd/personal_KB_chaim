@@ -1,5 +1,7 @@
 "use strict";
 let token, current, selectedKey, docId, detail;
+let importing=false, lastFiles;
+const sourceLabels={wechat_saved_html:'微信',zhihu_column_saved_html:'知乎',local_text:'TXT',local_markdown:'Markdown',local_image:'图片'};
 const $ = id => document.getElementById(id);
 const node = (tag, text, cls) => {const n=document.createElement(tag); if(text!==undefined)n.textContent=text; if(cls)n.className=cls; return n;};
 const show = text => {$('message').textContent=text;};
@@ -15,12 +17,14 @@ function readable(value){return JSON.stringify(value,null,2);}
 async function documents(){
  const docs=await api('/api/documents');$('documents').replaceChildren();const term=$('search').value.toLowerCase();
  for(const d of docs){if(d.error){$('documents').append(node('p',d.error));continue;}if(!(d.title+' '+d.source).toLowerCase().includes(term))continue;
- const b=node('button',d.title+' · 缺图 '+d.completeness.missing);b.onclick=()=>openDoc(d.documentId);$('documents').append(b);}
+ const b=node('button',d.title+' · '+(sourceLabels[d.source]||d.source)+' · '+d.documentId.slice(-6)+' · 缺图 '+d.completeness.missing);b.dataset.documentId=d.documentId;b.onclick=()=>openDoc(d.documentId);$('documents').append(b);}
 }
 async function openDoc(id,rev){docId=id;selectedKey=null;current=await api('/api/document?'+new URLSearchParams({doc:id,...(rev?{rev}:{})}));
  $('title').textContent=current.document.metadata.title;$('revision').replaceChildren();
  for(const r of current.record.revisions){const o=node('option',r.revisionId+(r.revisionId===current.record.currentRevisionId?' · current':' · 历史'));o.value=r.revisionId;$('revision').append(o);}
  $('revision').value=current.document.revision.revisionId;$('completeness').textContent='图片完整性：'+readable(current.document.assetCompleteness);
+ $('updateLabel').hidden=!id.startsWith('local-');
+ const source=current.document.source;const asset=current.document.assets[0];$('sourceInfo').textContent=(sourceLabels[current.document.metadata.sourceType]||current.document.metadata.sourceType)+' · 输入：'+(source.inputFileName||source.htmlFileName)+' · '+(source.encoding||source.htmlEncoding||source.mediaType||'')+(source.format==='image'&&asset?' · '+asset.width+' × '+asset.height+' · '+asset.sizeBytes+' 字节':'')+' · '+current.document.processing.status;
  $('reports').textContent=readable({processing:current.processingReport,resources:current.resourceManifest});renderBody();renderGroups();$('review').replaceChildren();
  sessionStorage.setItem('documentSelection',JSON.stringify({id,rev:current.document.revision.revisionId}));
 }
@@ -28,21 +32,27 @@ function renderBody(){
  $('body').replaceChildren();for(const b of current.document.blocks){let e;
  if(b.type==='image'){const valid=current.groups.find(g=>g.locations.some(l=>l.assetId===b.assetId));e=valid?imageFor(b.assetId):node('p','[缺失／不支持图片] '+b.assetId);if(b.caption){const f=node('figure');f.append(e,node('figcaption',b.caption));e=f;}}
  else if(b.type==='table'){e=node('table');for(const row of b.rows){const tr=node('tr');for(const cell of row)tr.append(node('td',cell));e.append(tr);}}
- else if(b.type==='list'){e=node(b.ordered?'ol':'ul');for(const item of b.items)e.append(node('li',item.content));}
+ else if(b.type==='list'){e=node(b.ordered?'ol':'ul');if(b.ordered&&b.items[0]?.number!==undefined)e.start=b.items[0].number;let stack=[e];for(const item of b.items){const depth=Math.min(item.depth||0,30);while(stack.length>depth+1)stack.pop();while(stack.length<depth+1){const sub=node(item.ordered?'ol':'ul');if(item.number!==undefined)sub.start=item.number;const parent=stack.at(-1);if(!parent.lastElementChild)parent.append(node('li',''));parent.lastElementChild.append(sub);stack.push(sub);}const li=node('li');if(item.number!==undefined)li.value=item.number;renderInlines(li,item.inlines,item.content);stack.at(-1).append(li);}}
+ else if(b.originalTag==='thematic_break')e=node('hr');
+ else if(b.plainText)e=node('pre',b.content||'','code');
  else e=node(b.type==='heading'?'h'+b.level:b.type==='code'?'pre':b.type==='quote'?'blockquote':'p',b.content||'[未支持内容]',b.type==='code'?'code':null);
+ if(b.inlines&&b.type!=='code')renderInlines(e,b.inlines,b.content);
  e.dataset.blockId=b.blockId;$('body').append(e);}
 }
+function renderInlines(root,spans,fallback){root.replaceChildren();if(!spans?.length){root.textContent=fallback||'';return;}for(const span of spans){let e=document.createTextNode(span.text);for(const mark of span.marks||[]){const wrap=node(mark==='strong'?'strong':mark==='code'?'code':'em');wrap.append(e);e=wrap;}if(span.href&&/^(https?:|mailto:)/i.test(span.href)){const a=node('a');a.href=span.href;a.rel='noopener noreferrer';a.target='_blank';a.append(e);e=a;}root.append(e);}}
 function renderGroups(){
  $('pictures').replaceChildren();$('consent').checked=false;
  for(const g of current.groups){const box=node('div',undefined,'group');box.append(imageFor(g.locations[0].assetId));const content=node('div');
  const label=node('label');const cb=node('input');cb.type='checkbox';cb.value=g.key;cb.disabled=g.localOnly||g.cache==='cache_review_rejected';cb.onchange=budget;label.append(cb,document.createTextNode(' 位置 '+g.locations.map(l=>l.order).join(',')+' · '+g.cache+' · '+g.reviewStatus+(g.localOnly?' · 禁止外发':'')));content.append(label);
+ content.append(node('p',g.image.mediaType+' · '+g.image.width+' × '+g.image.height+' · '+g.image.sizeBytes+' 字节'));
  const context=node('details');context.append(node('summary','查看必要上下文'),node('pre',readable(g.context)));content.append(context);
  const b=node('button','查看结果／审核');b.onclick=()=>openResult(g.key);content.append(b);box.append(content);$('pictures').append(box);}
  $('excluded').textContent=current.excluded.length?'无法处理的正文资源：'+readable(current.excluded):'';budget();
 }
 function keys(){return [...document.querySelectorAll('#pictures input:checked')].map(c=>c.value);}
 function budget(){const chosen=keys();const fresh=current?current.groups.filter(g=>chosen.includes(g.key)&&g.cache==='not_processed').length:0;$('budget').textContent=`选定 ${chosen.length} 个图片/上下文任务；最多 ${chosen.length*3} 次调用（待生成最多 ${fresh*3} 次），缓存不计费；缺密钥不会伪装成功。`;}
-async function upload(files){const f=new FormData();for(const file of files)f.append('files',file);f.append('requestId',crypto.randomUUID());const task=await api('/api/import',f);show('导入已排队 '+task.taskId);await pollTask(task.taskId);await documents();}
+async function upload(files,target=null,createNew=false){if(importing)return;importing=true;lastFiles=[...files];try{const f=new FormData();for(const file of files)f.append('files',file);f.append('requestId',crypto.randomUUID());if(target)f.append('targetDocumentId',target);if(createNew)f.append('createNew','true');if($('inputEncoding').value)f.append('encoding',$('inputEncoding').value);if($('mainMarkdown').value.trim())f.append('mainMarkdown',$('mainMarkdown').value.trim());const task=await api('/api/import',f);show('导入已排队 '+task.taskId);const done=await pollTask(task.taskId);renderImports(done.items);await documents();const row=done.items.find(i=>i.documentId);if(row)await openDoc(row.documentId);return done;}finally{importing=false;$('upload').value='';$('updateUpload').value='';}}
+function renderImports(items){const root=$('importResult');root.replaceChildren();const filesSnapshot=[...lastFiles];for(const [index,item] of items.entries()){const row=node('div');row.append(node('p',(item.originalName||'')+' · '+(item.error||item.decision||'')));if(item.documentId){const view=node('button','查看 '+(item.title||item.documentId));view.onclick=handle(()=>openDoc(item.documentId));row.append(view);}if(item.candidates){row.append(node('p','发现相同输入记录；不会自动合并。请选择：'));for(const candidate of item.candidates){const update=node('button','明确更新 '+candidate.title);update.onclick=handle(()=>upload([filesSnapshot[index]],candidate.documentId));row.append(update);}const fresh=node('button','仍作为新文档导入');fresh.onclick=handle(()=>upload([filesSnapshot[index]],null,true));row.append(fresh);}root.append(row);}}
 async function pollTask(id){
  for(;;){const t=await api('/api/task/'+id);$('importResult').textContent=t.operation==='import'?readable(t.items):$('importResult').textContent;
  show(`${t.operation} · ${t.state} · 已完成 ${t.items.length} · ${readable(t.progress||[])}`);await tasks();
@@ -77,5 +87,5 @@ async function tasks(){const rows=await api('/api/tasks');$('tasks').replaceChil
 function handle(fn){return async(...args)=>{try{await fn(...args);}catch(e){show('操作未完成：'+e.message);}};}
 window.addEventListener('unhandledrejection',e=>{e.preventDefault();show('操作未完成：'+(e.reason?.message||'请查看任务错误记录'));});
 window.addEventListener('DOMContentLoaded',handle(async()=>{const b=await api('/api/bootstrap');token=b.csrfToken;$('keyStatus').textContent='API凭据：'+(b.keyConfigured?'已配置':'未配置');$('actor').textContent=b.actor==='codex_test'?'功能验证模式 · 非用户验收':'';
- $('upload').onchange=handle(()=>upload($('upload').files));$('drop').ondragover=e=>e.preventDefault();$('drop').ondrop=handle(e=>{e.preventDefault();return upload(e.dataTransfer.files);});$('search').oninput=handle(documents);$('revision').onchange=handle(()=>openDoc(docId,$('revision').value));$('enrich').onclick=handle(()=>enrich(false));$('rerun').onclick=handle(()=>enrich(true));
+ $('upload').onchange=handle(()=>upload($('upload').files));$('updateUpload').onchange=handle(()=>upload($('updateUpload').files,docId));$('drop').ondragover=e=>e.preventDefault();$('drop').ondrop=handle(e=>{e.preventDefault();return upload(e.dataTransfer.files);});$('search').oninput=handle(documents);$('revision').onchange=handle(()=>openDoc(docId,$('revision').value));$('enrich').onclick=handle(()=>enrich(false));$('rerun').onclick=handle(()=>enrich(true));
  await documents();await tasks();const prior=sessionStorage.getItem('documentSelection');if(prior){const p=JSON.parse(prior);await openDoc(p.id,p.rev);}show('本地工作台就绪；刷新和查看不会触发模型调用。');}));

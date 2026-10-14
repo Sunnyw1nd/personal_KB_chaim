@@ -1,0 +1,125 @@
+{
+  "$defs": {
+    "ResourceEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "detectedType": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Detectedtype"
+        },
+        "referencedByPage": {
+          "title": "Referencedbypage",
+          "type": "boolean"
+        },
+        "referencedByBody": {
+          "title": "Referencedbybody",
+          "type": "boolean"
+        },
+        "decision": {
+          "enum": [
+            "kept",
+            "ignored",
+            "refused",
+            "missing"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "reasonCode": {
+          "title": "Reasoncode",
+          "type": "string"
+        },
+        "details": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Details"
+        },
+        "sizeBytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sizebytes"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        }
+      },
+      "required": [
+        "path",
+        "detectedType",
+        "referencedByPage",
+        "referencedByBody",
+        "decision",
+        "reasonCode"
+      ],
+      "title": "ResourceEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "enum": [
+        "1.0.0",
+        "1.1.0",
+        "2.0.0",
+        "3.0.0"
+      ],
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "documentId": {
+      "title": "Documentid",
+      "type": "string"
+    },
+    "resources": {
+      "items": {
+        "$ref": "#/$defs/ResourceEntry"
+      },
+      "title": "Resources",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "documentId",
+    "resources"
+  ],
+  "title": "ResourceManifest",
+  "type": "object"
+}

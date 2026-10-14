@@ -1,7 +1,8 @@
 # 本地工作台使用指南
 
-工作台用于本机文章导入、修订/正文查看、正文图片识别、审核和少量人工修改。只接受保存页ZIP，
-不支持URL抓取、TXT/MD/Office/PDF导入或检索。机器结果仍需审核，不能因结构通过自动入库。
+工作台用于本机资料导入、修订/正文查看、正文图片识别、审核和少量人工修改。支持保存页ZIP、
+TXT、Markdown、JPEG/PNG/WebP；MD有资源时用ZIP并明确主MD路径，具体见[本地输入指南](local-inputs.md)。
+不支持URL抓取、Office/PDF或检索。机器结果仍需审核，不能因结构通过自动入库。
 
 ## 安装、启动、停止
 
@@ -27,7 +28,8 @@ python -m wechat_html_normalizer.workbench.server
 
 ## 最短操作
 
-1. 拖入或选择一个/多个文章ZIP。原文件不动，上传副本按完整SHA隔离，同名不同包不覆盖。
+1. 拖入或选择一个/多个支持的文件。原文件不动，上传副本按完整SHA隔离。同内容本地文件会
+   提示重复候选；选择明确更新或仍新建，不按文件名自动合并。从本地文档页可“导入新版本”。
 2. 从左栏选择文章，切换current/历史修订。正文来自标准Document，不执行原网页；缺图占位
    保留，警告/资源清单可展开查看。历史查看不会改变current。
 3. 查看正文图片任务，展开必要上下文，选定范围并勾选外发确认，再点击识别/缓存按钮。
@@ -68,7 +70,7 @@ running任务，已完成及人工版本仍可读取。
 
 | 范围 | 用途 |
 | --- | --- |
-| `output/workbench/uploads/<完整SHA>/a.zip` | 不可变上传副本；短固定文件名避免Windows长路径；原文件名在upload-events保留 |
+| `output/workbench/uploads/<完整SHA>/a.<输入扩展名>` | 不可变上传副本；短固定文件名避免Windows长路径；原文件名在upload-events保留 |
 | `output/workbench/upload-events/` | 上传原名、完整哈希、大小和时间 |
 | `.work/wb/` | 复用既有安全ZIP检查的工作副本；不是原始事实来源 |
 | `output/documents/`（可配置） | 既有document-record/current/不可变修订 |
@@ -77,8 +79,9 @@ running任务，已完成及人工版本仍可读取。
 | `output/workbench/human/<binding hash>/revisions/` | 不可变人工草稿，保留父版本、原结果指纹及文档/修订/asset/位置 |
 | `human/.../events/`、`adoption.json` | 每次采用事件及最新指针；采用不等于修改机器审核 |
 
-任务与人工修订使用独立1.0.0契约，见新workbench Schema。原Document/Asset/结果Schema与Prompt
-没有改写。人工版本用于工作台展示，不写回原始Markdown，不进入检索，不成为Excel评测真值。
+任务与人工修订使用独立1.0.0契约，见workbench Schema。第十五轮本地来源使用Document3.0和
+DocumentRecord1.1；旧版事实、结果Schema和Prompt保持原字节。兼容与新Schema见[本地输入指南](local-inputs.md)。
+人工版本用于工作台展示，不写回原始Markdown，不进入检索，不成为Excel评测真值。
 同图同上下文合并执行但保留全部位置；同图不同上下文生成不同cache身份，而非只选第一处。
 
 ## 技术与安全
@@ -88,7 +91,7 @@ running任务，已完成及人工版本仍可读取。
 旧enrichment/annotation extra和三个命令保留。OpenAI SDK沿用已有可选依赖声明，未升级主环境。
 Flask比手写HTTP/multipart少维护解析代码，又不需要前端构建链；FastAPI/Streamlit不是本轮所必需。
 
-上传采用总量100MiB、单ZIP50MiB、最多30ZIP/32form parts及非文件表单内存限制，再执行原ZIP
+上传采用总量100MiB、单文件50MiB、最多30文件/36form parts及非文件表单内存限制，再执行原ZIP
 逐项安全检查。Host必须匹配实际127.0.0.1端口；写操作同时核验Origin和启动时随机CSRF token，
 不开放CORS；页面CSP不允许inline/unsafe-eval、iframe或公网资源。文件只能由已知文档/修订/asset
 定位，经逐层链接/越界和真实解码检查，不提供任意文件浏览接口。模型/用户文本用textContent，

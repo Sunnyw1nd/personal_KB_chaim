@@ -91,7 +91,7 @@ def _inline_payload(value: Any) -> Any:
 
 
 def _block_payload(block: Block) -> dict[str, object]:
-    return {
+    payload = {
         "type": block.type,
         "content": block.content,
         "inlines": _inline_payload(block.inlines),
@@ -106,6 +106,9 @@ def _block_payload(block: Block) -> dict[str, object]:
         "captionInlines": _inline_payload(block.caption_inlines),
         "sourceUrl": block.source_url,
     }
+    if block.plain_text is not None:
+        payload["plainText"] = block.plain_text
+    return payload
 
 
 def content_fingerprint(metadata: Metadata, blocks: list[Block]) -> str:
